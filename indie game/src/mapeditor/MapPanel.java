@@ -7,7 +7,7 @@ import java.awt.GridLayout;
 
 import javax.swing.JPanel;
 
-import static utilz.Constants.MapConstants.*;
+import static utilz.Constants.MapEditorConstants.*;
 
 public class MapPanel extends Panel{
 

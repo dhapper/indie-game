@@ -1,36 +1,33 @@
 package gamestates;
 
-import java.awt.Color;   
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.Iterator;
 
 import entities.Enemy;
+import entities.Entity;
+import entities.Ghost;
 import entities.Player;
+import entities.Slime;
 import location.ExitZone;
 import location.LocationManager;
 import main.Game;
-import utilz.HelpMethods;
-import utilz.LoadSave;
-
 
 public class Overworld extends State implements Statemethods{
 	
 	private Player player;
 	private LocationManager locationManager;
 	
+	public static boolean SHOW_HITBOXES = false;
 	
+	// camera offset vars
 	private int xLocationOffset, yLocationOffset;
 	private int leftBorder = (int) (0.4 * Game.GAME_WIDTH);
 	private int rightBorder = (int) (0.6 * Game.GAME_WIDTH);
 	private int upperBorder = (int) (0.4 * Game.GAME_HEIGHT);
 	private int lowerBorder = (int) (0.6 * Game.GAME_HEIGHT);
-	
 	private int locationTilesWide;
 	private int locationTilesHigh;
 	private int maxTilesOffsetX;
@@ -38,79 +35,107 @@ public class Overworld extends State implements Statemethods{
 	private int maxLocationOffsetX;
 	private int maxLocationOffsetY;
 	
+	// entity lists
+	private ArrayList<Entity> characters;
+	private ArrayList<Enemy> enemies;
+	
 	public Overworld(Game game) {
 		super(game);
-		initClasses();
 		
+		init();
 	}
-
 	
-	Enemy enemy;
-	private void initClasses() {
+	private void init() {
 		locationManager = new LocationManager(game);
-		player = new Player(100, 100, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE));
-		loadLocation(1);	// first map loaded
-		
-		enemy = new Enemy(500, 500, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE));
+		player = new Player( 6 * Game.TILES_SIZE, 10 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE));
+		loadLocation(0);	// first map loaded
 	}
 
 	@Override
 	public void draw(Graphics g) {
         locationManager.draw(g, xLocationOffset, yLocationOffset);;
 		player.render(g, xLocationOffset, yLocationOffset);
-		enemy.render(g, xLocationOffset, yLocationOffset);
+		
+		for(Enemy enemy : enemies)
+			enemy.render(g, xLocationOffset, yLocationOffset);
 	}
 	
 	@Override
 	public void update() {
+		// should only call when damage is dealt tbh
+		updateEnemyList();
+		
 		locationManager.update();
 		player.update();
 		checkCloseToBorder();
 		
 		checkExitZones();
 		
-		if(player.isUsingSpell())
-			waterRingKnockback();
-	}
-	
-	private void waterRingKnockback() {
-		
-		if(player.getWaterRing().getBoundary().intersects(enemy.getHitbox())) {
-			
-			float x1 = player.getHitbox().x;
-			float y1 = player.getHitbox().y;
-			float x2 = enemy.getHitbox().x;
-			float y2 = enemy.getHitbox().y;
-			
-			float[] vector = HelpMethods.GetVector(x1, y1, x2, y2);
-		    
-			enemy.getHitbox().x -= vector[0];
-			enemy.getHitbox().y -= vector[1];
-		}
-		
-	}
-
-	private void checkExitZones() {
-		
-		
-		for(ExitZone ez : locationManager.getCurrentLocation().getExitZones()) {
-			if(ez.getBoundary().intersects(player.getCollisionBox())) {
-				
-				player.updatePlayerPos(ez.getX(), ez.getY());
-				
-				loadLocation(ez.getLocationIndex());
+		if(player.isUsingSpell()) {
+			if(player.getWaterRing().isCastingSpell()) {
+				player.getWaterRing().spellEffect();
+			}else if(player.getFlamethrower().isCastingSpell()) {
+				player.getFlamethrower().spellEffect();
 			}
 		}
 		
+		for(Enemy enemy : enemies)
+			enemy.update();
+	}
+	
+	private void updateEnemyList() {
+	    Iterator<Enemy> iterator = enemies.iterator();
+	    while (iterator.hasNext()) {
+	        Enemy enemy = iterator.next();
+	        enemy.checkIfAlive();
+	        if (!enemy.isAlive()) {
+	            iterator.remove();
+	            System.out.println("enemy died...");
+	        }
+	    }
+	}
+
+	private void checkExitZones() {
+		for(ExitZone ez : locationManager.getCurrentLocation().getExitZones()) {
+			if(ez.getBoundary().intersects(player.getCollisionBox())) {
+				player.updatePlayerPos(ez.getX(), ez.getY());
+				loadLocation(ez.getLocationIndex());
+			}
+		}
+	}
+	
+	private void initLocationCharacters() {
+		characters = new ArrayList<Entity>();
+		characters.add(player);
+		enemies = new ArrayList<Enemy>();
 	}
 
 	private void loadLocation(int locationIndex) {
+		
+		// temporarily create enemys here
+		if(locationIndex == 0) {
+			initLocationCharacters();
+			enemies.add(new Ghost(20 * Game.TILES_SIZE, 18 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
+			enemies.add(new Ghost(22 * Game.TILES_SIZE, 19 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
+			enemies.add(new Slime(7 * Game.TILES_SIZE, 4 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
+			enemies.add(new Slime(8 * Game.TILES_SIZE, 5 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
+			characters.addAll(enemies);
+			
+			for(Enemy enemy : enemies) {
+				enemy.loadPlayerHitbox(player.getHitbox());
+			}
+			
+		}else if(locationIndex == 1) {
+			
+		}
 		
 		// set location in manager
 		locationManager.setCurrentLocation(locationIndex);
 		
 		// update map data for player
-		player.loadMapData(locationManager.getCurrentLocation().getMapData());
+		player.loadMapData(locationManager.getCurrentLocation().getMapData(), characters, enemies);
+		for(Enemy enemy : enemies)
+			enemy.loadMapData(locationManager.getCurrentLocation().getMapData(), characters, enemies);
 		
 		// load exit zones
 		locationManager.getLocations().get(locationIndex).loadExitZones();
@@ -126,10 +151,8 @@ public class Overworld extends State implements Statemethods{
 	
 	// calculates screen offset values when close to border
 	private void checkCloseToBorder() {
-		
 		int playerX = (int) player.getHitbox().x;
 		int playerY = (int) player.getHitbox().y;
-		
 		int xDiff = playerX - xLocationOffset;
 		int yDiff = playerY - yLocationOffset;
 		
@@ -158,23 +181,15 @@ public class Overworld extends State implements Statemethods{
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		
-		if(e.getButton() == MouseEvent.BUTTON1) {
+		if(e.getButton() == MouseEvent.BUTTON1)
 			player.setAttacking(true);
-		}
-		
-		if(e.getButton() == MouseEvent.BUTTON1) {
-			System.out.println("flame");
-			player.setUsingSpell(true);
-			player.getFlamethrower().setCastingSpell(true);
-		}
-		
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		if(!player.isUsingSpell())
+			if(e.getButton() == MouseEvent.BUTTON1)
+				player.getFlamethrower().initSpellUseVars(e.getX(), e.getY(), xLocationOffset, yLocationOffset);
 	}
 
 	@Override
@@ -205,8 +220,12 @@ public class Overworld extends State implements Statemethods{
 		case KeyEvent.VK_D:
 			player.setRight(true);
 			break;
+		
+		case KeyEvent.VK_H:
+			SHOW_HITBOXES = !SHOW_HITBOXES;
+			break;		
 			
-			
+		// temp load locations
 		case KeyEvent.VK_1:
 			loadLocation(0);
 			break;
@@ -214,9 +233,9 @@ public class Overworld extends State implements Statemethods{
 			loadLocation(1);
 			break;
 			
+		// cast water ring
 		case KeyEvent.VK_Q:
-			player.setUsingSpell(true);
-			player.getWaterRing().setCastingSpell(true);
+			player.getWaterRing().initSpellUseVars();
 			break;
 		}
 	}

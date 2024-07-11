@@ -4,18 +4,35 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+
+import graphics.GraphicsHelp;
+import utilz.LoadSave;
 
 public abstract class Entity {
 
+	protected String name;
 	protected float x, y;
 	protected int width, height;
-	protected Rectangle2D.Float hitbox;			// for damage
+	protected Rectangle2D.Float hitbox;			// for entity hitbox
 	protected Rectangle2D.Float collisionBox;	// for environment collision
 	
-	protected String name;
+	// animation vars
 	protected BufferedImage spriteSheet;
 	protected BufferedImage[][] animations;
+	protected BufferedImage[][] mirroredAnimations;
+	protected int aniTick, aniIndex;
 	
+	// location data
+	protected ArrayList<int[][]> mapData;
+	protected ArrayList<Entity> characterData;
+	protected ArrayList<Enemy> enemyData;
+	
+	// status
+	protected boolean moving = false;
+	protected boolean alive = true;
+	protected int action;
+	protected boolean facingRight = true;
 	
 	public Entity(float x, float y, int width, int height) {
 		this.x = x;
@@ -39,6 +56,31 @@ public abstract class Entity {
 		collisionBox = new Rectangle2D.Float(x, y, width, height);
 	}
 	
+	protected void loadAnimations(String filePath, int spritesWide, int spritesLong) {
+		spriteSheet = LoadSave.LoadImage(filePath);
+		animations = new BufferedImage[spritesLong][spritesWide];
+		mirroredAnimations = new BufferedImage[spritesLong][spritesWide];
+		
+		for(int j = 0; j < animations.length; j++) {
+			for(int i = 0; i < animations[j].length; i++) {
+				animations[j][i] = spriteSheet.getSubimage(i*32, j*32, 32, 32);
+				mirroredAnimations[j][i] = GraphicsHelp.MirrorImage(animations[j][i]);
+			}
+		}
+	}
+	
+	public void loadMapData(ArrayList<int[][]> mapData, ArrayList<Entity> characterData, ArrayList<Enemy> enemyData) {
+		this.mapData = mapData;
+		this.characterData = characterData;
+		this.enemyData = enemyData;
+	}
+	
+	protected void updateFacingDirection(float xSpeed) {
+		facingRight = xSpeed > 0 ? true : false;
+	}
+	
+	// getters and setters...
+	
 	public Rectangle2D.Float getHitbox() {
 		return hitbox;
 	}
@@ -55,5 +97,8 @@ public abstract class Entity {
 		this.spriteSheet = spriteSheet;
 	}
 	
+	public boolean isAlive() {
+		return alive;
+	}
 	
 }

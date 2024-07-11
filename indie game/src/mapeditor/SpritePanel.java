@@ -6,7 +6,7 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.image.BufferedImage;
 
-import static utilz.Constants.MapConstants.*;
+import static utilz.Constants.MapEditorConstants.*;
 
 public class SpritePanel extends Panel{
 

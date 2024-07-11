@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 import gamestates.GameState;
 import main.GamePanel;
 
-import static utilz.Constants.MapConstants.*;
+import static utilz.Constants.MapEditorConstants.*;
 
 public class MouseInputs implements MouseListener, MouseMotionListener{
 
@@ -84,6 +84,8 @@ public class MouseInputs implements MouseListener, MouseMotionListener{
 				MapEditor.LAYER = 1;
 			}else if(KeyboardInputs.key == '2') {
 				MapEditor.LAYER = 2;
+			}else if(KeyboardInputs.key == '3') {
+				MapEditor.LAYER = 3;
 			}
 			panel.repaint();
 		}

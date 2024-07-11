@@ -1,32 +1,26 @@
 package main;
 
-import java.awt.DisplayMode;
 import java.awt.Graphics;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.util.ArrayList;
 
-import entities.Player;
 import gamestates.GameState;
 import gamestates.Menu;
 import gamestates.Overworld;
-import location.LocationManager;
 
 public class Game implements Runnable{
 
 	private GameWindow gameWindow;
 	private GamePanel gamePanel;
 	private Thread gameThread;
+	
+	// specs
 	private final int FPS_SET = 120;
 	private final int UPS_SET = 200;
 	
-//	private Player player;
-//	
-//	private LocationManager locationManager;
-	
+	// gamestates
 	private Overworld overworld;
 	private Menu menu;
 	
+	// sizes
 	public final static int TILES_DEFAULT_SIZE = 32;
 	public final static float SCALE = 2.5f;
 	public final static int TILES_IN_WIDTH = 18;
@@ -88,12 +82,10 @@ public class Game implements Runnable{
 			break;
 		default:
 			break;
-		
 		}
 	}
 	
 	public void render(Graphics g) {
-		
 		
 		switch(GameState.state) {
 		case MENU:
@@ -104,20 +96,16 @@ public class Game implements Runnable{
 			break;
 		default:
 			break;
-		
 		}
 	}
 	
 	@Override
 	public void run() {
-		
 		// game loop
-		
 		double timePerFrame = 1000000000.0 / FPS_SET;
 		double timePerUpdate = 1000000000.0 / UPS_SET;
 		
 		long previousTime = System.nanoTime();
-		
 		long lastCheck = System.currentTimeMillis();
 		
 		double deltaU = 0;

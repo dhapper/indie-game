@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
-import static utilz.Constants.MapConstants.*;
+import static utilz.Constants.MapEditorConstants.*;
 
 public class MapEditor extends JFrame{
 

@@ -1,22 +1,35 @@
 package entities;
 
+import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.geom.Rectangle2D;
 
 import main.Game;
-import utilz.LoadSave;
+import utilz.HelpMethods;
 
-public class Enemy extends Entity{
+public abstract class Enemy extends Entity{
 
 	// hitbox vars
-	private float xDrawOffset = 7 * Game.SCALE;
-	private float yDrawOffset = 5 * Game.SCALE;
-	private float hitboxWidth = 15 * Game.SCALE;
-	private float hitboxHeight = 27 * Game.SCALE;
+	protected float xDrawOffset;
+	protected float yDrawOffset;
+	protected float hitboxWidth;
+	protected float hitboxHeight;
+	protected float xCollisionBoxOffset;
+	protected float yCollisionBoxOffset;
+	protected float collisionBoxWidth;
+	protected float collisionBoxHeight;
 	
-	private float xCollisionBoxOffset = 0 * Game.SCALE;
-	private float yCollisionBoxOffset = 22 * Game.SCALE;
-	private float collisionBoxWidth = 15 * Game.SCALE;
-	private float collisionBoxHeight = 5 * Game.SCALE;
+	// stats
+	protected int maxHealth = 5;
+	protected int health = maxHealth;
+	protected float speed;
+	
+	// status
+	protected boolean affectedDuringSpell = false;
+	protected boolean completedDeathAnimation = false;
+	
+	// player hitbox reference
+	protected Rectangle2D.Float player;
 	
 	public Enemy(float x, float y, int width, int height) {
 		super(x, y, width, height);
@@ -26,7 +39,115 @@ public class Enemy extends Entity{
 	}
 	
 	public void render(Graphics g, int xOffset, int yOffset) {
-		g.drawImage(LoadSave.LoadImage("player/redHood.png").getSubimage(0, 0, 32, 32), (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);
+		
+	}
+	
+	public void update() {
+		
+	}
+	
+	public void drawHealthBar(Graphics g, int xOffset, int yOffset) {
+		
+		float xPos = hitbox.x - xDrawOffset - xOffset;
+		float yPos = hitbox.y - yDrawOffset - yOffset;
+		
+		float width = 16 * Game.SCALE;
+		float height = 3 * Game.SCALE;
+		float heightAboveEntity = 6 * Game.SCALE;
+		float healthBarX = xPos + hitbox.width/2 - width/2; 
+		float healthBarY = yPos - heightAboveEntity;
+		
+		health = Math.max(health, 0);
+		
+		g.setColor(Color.RED);
+		g.fillRect((int) healthBarX, (int) healthBarY, (int) ((1.0 * health / maxHealth) * width), (int) height);
+		g.setColor(Color.BLACK);
+		g.drawRect((int) healthBarX, (int) healthBarY, (int) width, (int) height);
+		
+	}
+	
+	public boolean checkLineOfSight(Rectangle2D.Float player) {
+		float playerCenterX = player.x + player.width/2;
+		float playerCenterY = player.y + player.height/2;
+		float enemyCenterX = hitbox.x + hitbox.width/2;
+		float enemyCenterY = hitbox.y + hitbox.height/2;
+		
+		float distance = (float) Math.sqrt((Math.pow((playerCenterX - enemyCenterX), 2) + Math.pow((playerCenterY - enemyCenterY), 2)));
+		
+		if(distance < Game.TILES_SIZE * 4 && distance > Game.TILES_SIZE * 0.25)
+			if(!affectedDuringSpell)
+				return true;
+		return false;
+	}
+	
+	protected void updateAnimationTick(int spriteAmount, int duration) {
+		aniTick++;
+		if(aniTick >= duration) {	// check if sprite exceeds frame duration
+			aniTick = 0;
+			aniIndex++;
+			if(aniIndex >= spriteAmount)// check if animation is complete
+				aniIndex = 0;
+		}
+	}
+	
+	protected void moveTowardsPos(float speed, float[] vector) {
+		updatePos(speed * vector[0]/10, speed * vector[1]/10);
+	}
+
+	public void updatePos(float xSpeed, float ySpeed) {
+		moving = false;
+		
+		// horizontal movement
+	    if (xSpeed != 0) {
+	        if (HelpMethods.CanMoveHere(this, collisionBox.x + xSpeed, collisionBox.y, collisionBox.width, collisionBox.height, mapData)) {
+	        	if(!HelpMethods.IsEntityThere(this, xSpeed, 0, characterData)) {
+		            hitbox.x += xSpeed;
+		            collisionBox.x += xSpeed;
+		            moving = true;
+		            updateFacingDirection(xSpeed);
+	        	}
+	        }
+	    }
+
+	    // vertical movement
+	    if (ySpeed != 0) {
+	        if (HelpMethods.CanMoveHere(this, collisionBox.x, collisionBox.y + ySpeed, collisionBox.width, collisionBox.height, mapData)) {
+	        	if(!HelpMethods.IsEntityThere(this, 0, ySpeed, characterData)) {
+		            hitbox.y += ySpeed;
+		            collisionBox.y += ySpeed;
+		            moving = true;
+	        	}
+	        }
+	    }
+		
+	}
+	
+	public void checkIfAlive() {
+		if(health <= 0)
+			alive = false;
+	}
+	
+	protected void resetAniTick() {
+		aniTick = 0;
+		aniIndex = 0;
+	}
+	
+	public void loadPlayerHitbox(Rectangle2D.Float player) {
+		this.player = player;
+	}
+	
+	// getters and setters
+	
+	public void damageEnemy(int damage) {
+		this.health -= damage;
+	}
+
+	public boolean isAffectedDuringSpell() {
+		return affectedDuringSpell;
+	}
+
+	public void setAffectedDuringSpell(boolean damagedDuringSpell) {
+		this.affectedDuringSpell = damagedDuringSpell;
 	}
 
 }

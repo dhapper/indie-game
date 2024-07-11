@@ -7,7 +7,7 @@ import javax.swing.SwingUtilities;
 import graphics.GraphicsHelp;
 import utilz.LoadSave;
 
-import static utilz.Constants.MapConstants.*;
+import static utilz.Constants.MapEditorConstants.*;
 
 public class SpriteSheets {
 	

@@ -1,53 +1,38 @@
 package entities;
 
-import static utilz.Constants.Directions.*;  
 import static utilz.Constants.PlayerConstants.*;
 
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
-
+import gamestates.Overworld;
 import main.Game;
 import spells.Flamethrower;
 import spells.WaterRing;
 import utilz.HelpMethods;
-import utilz.LoadSave;
 
 public class Player extends Entity{
 	
-	private boolean moving = false, attacking = false;
-	private boolean left, up, right, down;
-	private float playerSpeed = 2.0f;
-	
-	// animation vars
-	private int aniTick, aniIndex;
-	private int playerAction = WALKING;
-	private boolean usingSpell = false;
-	
 	// hitbox vars
-	private float xDrawOffset = 7 * Game.SCALE;
+	private float xDrawOffset = 8.5f * Game.SCALE;
 	private float yDrawOffset = 5 * Game.SCALE;
 	private float hitboxWidth = 15 * Game.SCALE;
 	private float hitboxHeight = 27 * Game.SCALE;
-	
 	private float xCollisionBoxOffset = 0 * Game.SCALE;
 	private float yCollisionBoxOffset = 22 * Game.SCALE;
 	private float collisionBoxWidth = 15 * Game.SCALE;
 	private float collisionBoxHeight = 5 * Game.SCALE;
 	
-	private ArrayList<int[][]> mapData;
+	// movement vars
+	private boolean left, up, right, down;
+	private float playerSpeed = 0.85f * Game.SCALE;
 	
-	private BufferedImage[] spellFront, spellBack;
-	private int[] aniSpeed = {120, 120};
+	// status
+	private boolean usingSpell = false;
+	private boolean attacking = false;
 		
+	// spells
 	private WaterRing waterRing;
 	private Flamethrower flamethrower;
 	
@@ -59,7 +44,7 @@ public class Player extends Entity{
 		this.waterRing = new WaterRing(this);
 		this.flamethrower = new Flamethrower(this);
 		
-		loadAnimations();
+		loadAnimations("player/redHood.png", 8, 9);
 		
 		initHitbox(x, y, hitboxWidth, hitboxHeight);
 		initCollisionBox(x + xCollisionBoxOffset, y + yCollisionBoxOffset, collisionBoxWidth, collisionBoxHeight);
@@ -72,22 +57,17 @@ public class Player extends Entity{
 	}
 	
 	public void render(Graphics g, int xOffset, int yOffset) {
+		if(waterRing.isCastingSpell())
+			waterRing.draw(g, xOffset, yOffset);
 		
-		if(!usingSpell)
-			g.drawImage(animations[playerAction][aniIndex], (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);
-		
-		if(waterRing.isCastingSpell()) {
-			waterRing.drawBeforePlayer(g, xOffset, yOffset);
-			g.drawImage(animations[playerAction][aniIndex], (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);
-			waterRing.drawAfterPlayer(g, xOffset, yOffset);
-		}
-		
-		if(flamethrower.isCastingSpell()) {
-			g.drawImage(animations[playerAction][aniIndex], (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);
+		if(flamethrower.isCastingSpell())
 			flamethrower.draw(g, xOffset, yOffset);
-		}
+
+		BufferedImage sprite = facingRight ? animations[action][aniIndex] : mirroredAnimations[action][aniIndex];
+		g.drawImage(sprite, (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);
 		
-		//drawHitbox(g, xOffset, yOffset);
+		if(Overworld.SHOW_HITBOXES)
+			drawHitbox(g, xOffset, yOffset);
 	}
 	
 	public void updatePlayerPos(int x, int y) {
@@ -98,37 +78,36 @@ public class Player extends Entity{
 	}
 	
 	private void updateAnimationTick() {
-		
 		aniTick++;
-		if(aniTick >= GetSpriteDuration(playerAction)[aniIndex]) {	// check if sprite exceeds frame duration
+		if(aniTick >= GetSpriteDuration(action)[aniIndex]) {	// check if sprite exceeds frame duration
 			aniTick = 0;
 			aniIndex++;
-			if(aniIndex >= GetSpriteAmount(playerAction)) {	// check if animation is complete
+			if(aniIndex >= GetSpriteAmount(action)) {	// check if animation is complete
 				aniIndex = 0;
 				attacking = false;
 			}
 		}
 		
+		// seperate
 		if(flamethrower.isCastingSpell())
 			flamethrower.updateAnimationTick();
 		
 		if(waterRing.isCastingSpell())
 			waterRing.updateAnimationTick();
-		
 	}
 	
 	private void setAnimation() {
-		int startAni = playerAction;
+		int startAni = action;
 		
 		if(moving)
-			playerAction = WALKING;
+			action = WALKING;
 		else
-			playerAction = IDLE;
+			action = IDLE;
 		
 		if(attacking)
-			playerAction = ATTACKING;
+			action = ATTACKING;
 		
-		if(startAni !=  playerAction)
+		if(startAni !=  action)
 			resetAniTick();
 	}
 	
@@ -163,39 +142,27 @@ public class Player extends Entity{
 		
 		// horizontal movement
 	    if (xSpeed != 0) {
-	        if (HelpMethods.CanMoveHere(collisionBox.x + xSpeed, collisionBox.y, collisionBox.width, collisionBox.height, mapData)) {
-	            hitbox.x += xSpeed;
-	            collisionBox.x += xSpeed;
-	            moving = true;
+	        if (HelpMethods.CanMoveHere(this, collisionBox.x + xSpeed, collisionBox.y, collisionBox.width, collisionBox.height, mapData)) {
+	        	if(!HelpMethods.IsEntityThere(this, xSpeed, 0, characterData)) {
+	        		hitbox.x += xSpeed;
+		            collisionBox.x += xSpeed;
+		            moving = true;
+		            updateFacingDirection(xSpeed);
+	        	}
 	        }
 	    }
 
 	    // vertical movement
 	    if (ySpeed != 0) {
-	        if (HelpMethods.CanMoveHere(collisionBox.x, collisionBox.y + ySpeed, collisionBox.width, collisionBox.height, mapData)) {
-	            hitbox.y += ySpeed;
-	            moving = true;
-	            collisionBox.y += ySpeed;
+	        if (HelpMethods.CanMoveHere(this, collisionBox.x, collisionBox.y + ySpeed, collisionBox.width, collisionBox.height, mapData)) {
+	        	if(!HelpMethods.IsEntityThere(this, 0, ySpeed, characterData)) {
+		            hitbox.y += ySpeed;
+		            moving = true;
+		            collisionBox.y += ySpeed;
+	        	}
 	        }
 	    }
 		
-	}
-	
-	private void loadAnimations() {
-		
-		spriteSheet = LoadSave.LoadImage("player/redHood.png");
-		
-		animations = new BufferedImage[9][8];
-		for(int j = 0; j < animations.length; j++) {
-			for(int i = 0; i < animations[j].length; i++) {
-				animations[j][i] = spriteSheet.getSubimage(i*32, j*32, 32, 32);
-			}
-		}
-		
-	}
-	
-	public void loadMapData(ArrayList<int[][]> mapData) {
-		this.mapData = mapData;
 	}
 	
 	public void resetDirBooleans() {
@@ -205,10 +172,11 @@ public class Player extends Entity{
 		down = false;
 	}
 	
+	// getters and setters...
+	
 	public void setAttacking(boolean attacking) {
 		this.attacking = attacking;
 	}
-	
 
 	public boolean isLeft() {
 		return left;
@@ -258,6 +226,12 @@ public class Player extends Entity{
 		return flamethrower;
 	}
 
+	public ArrayList<Entity> getNpcData(){
+		return characterData;
+	}
 	
+	public ArrayList<Enemy> getEnemyData(){
+		return enemyData;
+	}
 	
 }

@@ -1,15 +1,10 @@
 package gamestates;
 
-import java.awt.Color;
-
 import java.awt.Graphics;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 
 import main.Game;
-import utilz.LoadSave;
 
 public class Menu extends State implements Statemethods{
 	
@@ -27,10 +22,6 @@ public class Menu extends State implements Statemethods{
 	public void draw(Graphics g) {
 		g.drawRect(100, 100, 100, 100);
 		g.drawString("Menu, press enter", 300, 300);
-		
-		g.drawImage(LoadSave.LoadImage("player/player.png"), 100, 100, 64*2, 64*2, null);
-		
-		g.drawRect(0, 0, 100, 100);
 	}
 
 	@Override

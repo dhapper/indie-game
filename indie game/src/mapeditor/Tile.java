@@ -5,9 +5,10 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import graphics.GraphicsHelp;
+import utilz.Constants;
 import utilz.LoadSave;
 
-import static utilz.Constants.MapConstants.*;
+import static utilz.Constants.MapEditorConstants.*;
 
 public class Tile {
 
@@ -21,8 +22,13 @@ public class Tile {
 
 	public void changeSprite(int index) {
 		this.spriteIndex = index;
-		if(MapEditor.LAYER != 0)
-			this.sprite = GraphicsHelp.DecreaseAlpha(MapEditor.SPRITE_LAYERS.get(MapEditor.LAYER).getSprites()[index], 0.60f);
+		
+		int rowIndex = index - index%(MapEditor.SPRITE_LAYERS.get(MapEditor.LAYER).getWidth());
+		
+		if(MapEditor.LAYER == ANIMATED_SPRITES)
+			this.sprite = GraphicsHelp.DecreaseAlpha(MapEditor.SPRITE_LAYERS.get(MapEditor.LAYER).getSprites()[rowIndex], 0.70f);
+		else if(MapEditor.LAYER != 0)
+			this.sprite = GraphicsHelp.DecreaseAlpha(MapEditor.SPRITE_LAYERS.get(MapEditor.LAYER).getSprites()[index], 0.70f);
 		else
 			this.sprite = MapEditor.SPRITE_LAYERS.get(MapEditor.LAYER).getSprites()[index];
 	}
