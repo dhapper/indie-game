@@ -1,6 +1,7 @@
 package entities;
 
 import java.awt.Color;
+
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -8,6 +9,8 @@ import java.util.ArrayList;
 
 import graphics.GraphicsHelp;
 import utilz.LoadSave;
+
+import static utilz.Constants.Directions.*;
 
 public abstract class Entity {
 
@@ -75,8 +78,11 @@ public abstract class Entity {
 		this.enemyData = enemyData;
 	}
 	
-	protected void updateFacingDirection(float xSpeed) {
-		facingRight = xSpeed > 0 ? true : false;
+	protected void updateFacingDirection(float xSpeed, int mode) {
+		if(mode == TOWARDS)
+			facingRight = xSpeed > 0 ? true : false;
+		else if(mode == AWAY)
+			facingRight = xSpeed > 0 ? false : true;
 	}
 	
 	// getters and setters...

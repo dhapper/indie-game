@@ -1,11 +1,13 @@
 package entities;
 
-import java.awt.Color;
+import java.awt.Color; 
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 
 import main.Game;
 import utilz.HelpMethods;
+
+import static utilz.Constants.Directions.*;
 
 public abstract class Enemy extends Entity{
 
@@ -25,6 +27,7 @@ public abstract class Enemy extends Entity{
 	protected float speed;
 	
 	// status
+	protected boolean affectedDuringAttack = false;
 	protected boolean affectedDuringSpell = false;
 	protected boolean completedDeathAnimation = false;
 	
@@ -90,11 +93,11 @@ public abstract class Enemy extends Entity{
 		}
 	}
 	
-	protected void moveTowardsPos(float speed, float[] vector) {
-		updatePos(speed * vector[0]/10, speed * vector[1]/10);
+	public void moveTowardsPos(float speed, float[] vector, int mode) {
+		updatePos(speed * vector[0]/10, speed * vector[1]/10, mode);
 	}
 
-	public void updatePos(float xSpeed, float ySpeed) {
+	public void updatePos(float xSpeed, float ySpeed, int mode) {
 		moving = false;
 		
 		// horizontal movement
@@ -104,7 +107,7 @@ public abstract class Enemy extends Entity{
 		            hitbox.x += xSpeed;
 		            collisionBox.x += xSpeed;
 		            moving = true;
-		            updateFacingDirection(xSpeed);
+		            updateFacingDirection(xSpeed, mode);
 	        	}
 	        }
 	    }
@@ -149,5 +152,15 @@ public abstract class Enemy extends Entity{
 	public void setAffectedDuringSpell(boolean damagedDuringSpell) {
 		this.affectedDuringSpell = damagedDuringSpell;
 	}
+
+	public boolean isAffectedDuringAttack() {
+		return affectedDuringAttack;
+	}
+
+	public void setAffectedDuringAttack(boolean affectedDuringAttack) {
+		this.affectedDuringAttack = affectedDuringAttack;
+	}
+	
+	
 
 }

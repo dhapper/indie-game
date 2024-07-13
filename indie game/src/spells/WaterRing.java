@@ -10,6 +10,7 @@ import entities.Enemy;
 import entities.Player;
 import gamestates.Overworld;
 import main.Game;
+import utilz.Constants;
 import utilz.HelpMethods;
 import utilz.LoadSave;
 
@@ -44,7 +45,9 @@ public class WaterRing extends Spell implements SpellMethods{
 				
 				float[] vector = HelpMethods.GetVector(x1, y1, x2, y2);
 				
-				enemy.updatePos(-vector[0], -vector[1]);
+				float[] adjustedVector = {-1 * vector[0], -1 * vector[1]}; 
+				
+				enemy.moveTowardsPos(5f * Game.SCALE, adjustedVector, Constants.Directions.AWAY);
 				
 			}
 		}

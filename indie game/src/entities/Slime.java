@@ -1,6 +1,6 @@
 package entities;
 
-import static utilz.Constants.SlimeConstants.*;
+import static utilz.Constants.SlimeConstants.*; 
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -9,6 +9,8 @@ import gamestates.Overworld;
 import main.Game;
 import utilz.HelpMethods;
 import utilz.LoadSave;
+
+import static utilz.Constants.Directions.*;
 
 public class Slime extends Enemy{
 
@@ -65,7 +67,7 @@ public class Slime extends Enemy{
 		updateAnimationTick(GetSpriteAmount(action), GetSpriteDuration(action));
 		
 		if(checkLineOfSight(player))
-			moveTowardsPos(speed, HelpMethods.GetVector(player.x + player.width/2, player.y + player.height/2, hitbox.x + hitbox.width/2, hitbox.y + hitbox.height/2));
+			moveTowardsPos(speed, HelpMethods.GetVector(player.x + player.width/2, player.y + player.height/2, hitbox.x + hitbox.width/2, hitbox.y + hitbox.height/2), TOWARDS);
 		
 		setAnimation();
 		

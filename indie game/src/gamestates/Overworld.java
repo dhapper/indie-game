@@ -81,7 +81,14 @@ public class Overworld extends State implements Statemethods{
 		
 		for(Enemy enemy : enemies)
 			enemy.update();
+		
+		if(player.isInBufferFrames()) {
+			System.out.println(i);
+			i++;
+		}else
+			i = 0;
 	}
+	int i = 0;
 	
 	private void updateEnemyList() {
 	    Iterator<Enemy> iterator = enemies.iterator();
@@ -181,14 +188,39 @@ public class Overworld extends State implements Statemethods{
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if(e.getButton() == MouseEvent.BUTTON1)
-			player.setAttacking(true);
+		
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		
+		// also make sure its mb1 for now?
+		if(player.isInBufferFrames()) {
+			
+			if(player.isAttacking())
+				player.setNextAttackSelected(true);
+			else
+				player.increaseAttackIndex();
+		}
+		
+		// attack
+		if(!player.isAttacking()) {
+			
+			if(!player.isInBufferFrames()) {
+				player.setCurrentAttackIndex(0);
+			}
+			
+			if(e.getButton() == MouseEvent.BUTTON1) {
+				player.setMouseVars(e.getX(), e.getY());
+				player.setLocationOffset(xLocationOffset, yLocationOffset);
+				
+				player.setAttacking(true);
+			}
+		}
+		
+		// flamethrower
 		if(!player.isUsingSpell())
-			if(e.getButton() == MouseEvent.BUTTON1)
+			if(e.getButton() == MouseEvent.BUTTON3)
 				player.getFlamethrower().initSpellUseVars(e.getX(), e.getY(), xLocationOffset, yLocationOffset);
 	}
 

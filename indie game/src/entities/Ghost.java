@@ -1,11 +1,14 @@
 package entities;
 
 import java.awt.Graphics;
+
 import java.awt.image.BufferedImage;
 
 import gamestates.Overworld;
 import main.Game;
 import utilz.HelpMethods;
+
+import static utilz.Constants.Directions.*;
 
 public class Ghost extends Enemy{
 
@@ -74,7 +77,7 @@ public class Ghost extends Enemy{
 				
 				speed = i < 250 ? i/20 : (500 - i)/20;
 				
-				moveTowardsPos(speed, currentAttackVector);
+				moveTowardsPos(speed, currentAttackVector, TOWARDS);
 				i++;
 				System.out.println(i);
 			}

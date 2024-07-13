@@ -2,6 +2,13 @@ package utilz;
 
 public class Constants {
 
+	public static class Attack{
+		public static final int BASIC = 0;
+		public static final int FINISHER = 1;
+		
+		public static final int BUFFER_FRAMES = 30;
+	}
+	
 	public static class MapEditorConstants{
 		public static final int TILE_SIZE = 32;
 		public static final int VISIBLE_MAP_TILE_WIDTH = 40;
@@ -32,10 +39,18 @@ public class Constants {
 	}
 	
 	public static class Directions{
-		public static final int LEFT = 0;
-		public static final int UP = 1;
-		public static final int RIGHT = 2;
-		public static final int DOWN = 3;
+		public static final int UP = 0;
+		public static final int DOWN = 1;
+		public static final int LEFT = 2;
+		public static final int RIGHT = 3;
+		
+		public static final int UP_LEFT = 4;
+		public static final int UP_RIGHT = 5;
+		public static final int DOWN_LEFT = 6;
+		public static final int DOWN_RIGHT = 7;
+		
+		public static final int TOWARDS = 0;
+		public static final int AWAY = 1;
 	}
 	
 	public static class SlimeConstants{

@@ -167,8 +167,8 @@ public class Flamethrower extends Spell implements SpellMethods{
 	        aniTick = 0;
 	        aniIndex++;
 	        if (aniIndex >= numOfFrames[state]) { // check if animation is complete
-	            aniIndex = 0;
-
+	        	aniIndex = 0;
+	        	
 	            switch (state) {
 	                case GROWTH:
 	                    state = MATURE;

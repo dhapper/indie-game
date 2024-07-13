@@ -43,5 +43,23 @@ public class GraphicsHelp {
 	    }
 	    return null;
 	}
+	
+	public static BufferedImage RotateImage(BufferedImage img, double degrees) {
+        if (img != null) {
+            int width = img.getWidth();
+            int height = img.getHeight();
+            BufferedImage rotatedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = rotatedImage.createGraphics();
+            
+            AffineTransform transform = new AffineTransform();
+            transform.rotate(Math.toRadians(degrees), width / 2.0, height / 2.0);
+            g.setTransform(transform);
+            g.drawImage(img, 0, 0, null);
+            g.dispose();
+            
+            return rotatedImage;
+        }
+        return null;
+    }
 
 }
