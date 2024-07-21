@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 
+import entities.enemy.Entity;
+import entities.player.Player;
 import main.Game;
 import utilz.HelpMethods;
 
@@ -25,14 +27,17 @@ public abstract class Enemy extends Entity{
 	protected int maxHealth = 5;
 	protected int health = maxHealth;
 	protected float speed;
+	protected int damage = 1;
 	
 	// status
 	protected boolean affectedDuringAttack = false;
 	protected boolean affectedDuringSpell = false;
 	protected boolean completedDeathAnimation = false;
+	protected float xSpeed, ySpeed;
 	
-	// player hitbox reference
-	protected Rectangle2D.Float player;
+	// player reference
+	protected Player player;
+	protected Rectangle2D.Float playerHitbox;
 	
 	public Enemy(float x, float y, int width, int height) {
 		super(x, y, width, height);
@@ -47,6 +52,16 @@ public abstract class Enemy extends Entity{
 	
 	public void update() {
 		
+	}
+	
+	public void damagePlayer() {
+		if(HelpMethods.IsSpecificHitboxThere(this, playerHitbox, xSpeed, ySpeed)) {
+			if(!player.isInvincible()) {
+				player.decreaseHealth(damage);
+				if(player.isAlive())
+					player.setInvincible(true);
+			}
+		}
 	}
 	
 	public void drawHealthBar(Graphics g, int xOffset, int yOffset) {
@@ -94,7 +109,9 @@ public abstract class Enemy extends Entity{
 	}
 	
 	public void moveTowardsPos(float speed, float[] vector, int mode) {
-		updatePos(speed * vector[0]/10, speed * vector[1]/10, mode);
+		xSpeed = speed * vector[0]/10;
+		ySpeed = speed * vector[1]/10;
+		updatePos(xSpeed, ySpeed, mode);
 	}
 
 	public void updatePos(float xSpeed, float ySpeed, int mode) {
@@ -107,7 +124,7 @@ public abstract class Enemy extends Entity{
 		            hitbox.x += xSpeed;
 		            collisionBox.x += xSpeed;
 		            moving = true;
-		            updateFacingDirection(xSpeed, mode);
+		            updateFacingDirectionX(xSpeed, mode);
 	        	}
 	        }
 	    }
@@ -135,7 +152,11 @@ public abstract class Enemy extends Entity{
 		aniIndex = 0;
 	}
 	
-	public void loadPlayerHitbox(Rectangle2D.Float player) {
+	public void loadPlayerHitbox(Rectangle2D.Float playerHitbox) {
+		this.playerHitbox = playerHitbox;
+	}
+	
+	public void loadPlayer(Player player) {
 		this.player = player;
 	}
 	

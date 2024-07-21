@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
 import gamestates.GameState;
+import main.Game;
 import main.GamePanel;
 
 import static utilz.Constants.MapEditorConstants.*;
@@ -24,8 +25,8 @@ public class MouseInputs implements MouseListener, MouseMotionListener{
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		
-		int x = e.getX() / TILE_SIZE;
-		int y = e.getY() / TILE_SIZE;
+		int x = e.getX() / Game.TILES_DEFAULT_SIZE;
+		int y = e.getY() / Game.TILES_DEFAULT_SIZE;
 		
 		Tile[][] tiles = MapEditor.TILE_LAYERS.get(MapEditor.LAYER);
 		
@@ -64,16 +65,16 @@ public class MouseInputs implements MouseListener, MouseMotionListener{
 	@Override
 	public void mousePressed(MouseEvent e) {
 		
-		int x = e.getX() / TILE_SIZE;
-		int y = e.getY() / TILE_SIZE;
+		int x = e.getX() / Game.TILES_DEFAULT_SIZE;
+		int y = e.getY() / Game.TILES_DEFAULT_SIZE;
 		
 		Tile[][] tiles = MapEditor.TILE_LAYERS.get(MapEditor.LAYER);
 		int spriteIndex = tiles[y][x].getSpriteIndex();
 		
 		// check if mouse in bounds
-		if(e.getX() < 0 || e.getX() > MapEditor.WIDTH * TILE_SIZE)
+		if(e.getX() < 0 || e.getX() > MapEditor.WIDTH * Game.TILES_DEFAULT_SIZE)
 			return;
-		else if(e.getY() < 0 || e.getY() > MapEditor.HEIGHT * TILE_SIZE)
+		else if(e.getY() < 0 || e.getY() > MapEditor.HEIGHT * Game.TILES_DEFAULT_SIZE)
 			return;
 		
 		// switch layer

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
+import main.Game;
+
 import static utilz.Constants.MapEditorConstants.*;
 
 public class MapEditor extends JFrame{
@@ -33,7 +35,7 @@ public class MapEditor extends JFrame{
 		
 		setTitle("Map Editor");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize((int) (TILE_SIZE * (VISIBLE_MAP_TILE_WIDTH + 6 + 0.5f)), (int) (TILE_SIZE * (VISIBLE_MAP_TILE_HEIGHT + 1.7f)));
+        setSize((int) (Game.TILES_DEFAULT_SIZE * (VISIBLE_MAP_TILE_WIDTH + 6 + 0.5f)), (int) (Game.TILES_DEFAULT_SIZE * (VISIBLE_MAP_TILE_HEIGHT + 1.7f)));
         setLayout(new BorderLayout());
         
         spritePanel = new SpritePanel();

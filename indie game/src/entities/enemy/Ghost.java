@@ -1,12 +1,14 @@
-package entities;
+package entities.enemy;
 
 import java.awt.Graphics;
 
 import java.awt.image.BufferedImage;
 
+import entities.Enemy;
 import gamestates.Overworld;
 import main.Game;
 import utilz.HelpMethods;
+import utilz.ImageHelpMethods;
 
 import static utilz.Constants.Directions.*;
 
@@ -22,26 +24,30 @@ public class Ghost extends Enemy{
 	private float collisionBoxWidth = 20 * Game.SCALE;
 	private float collisionBoxHeight = 12 * Game.SCALE;
 	
+	private int aniTick = 0;	// only resets after each attack
+	private int totalAttackTime = 500;
+	private float[] currentAttackVector;
+	private int speedDivisor = 20;
+	private boolean attacking;
+	
 	public Ghost(float x, float y, int width, int height) {
 		super(x, y, width, height);
 		
 		init();
-		
-		loadAnimations("npc/enemy/ghost.png", 6, 1);
-		
-		initHitbox(x, y, hitboxWidth, hitboxHeight);
-		initCollisionBox(x + xCollisionBoxOffset, y + yCollisionBoxOffset, collisionBoxWidth, collisionBoxHeight);
 	}
 	
 	private void init() {
+		animations = ImageHelpMethods.GetDefaultSizeSprites("npc/enemy/ghost.png", 6, 1);
+		mirroredAnimations = ImageHelpMethods.GetMirroredSprites(animations);
+		
+		initHitbox(x, y, hitboxWidth, hitboxHeight);
+		initCollisionBox(x + xCollisionBoxOffset, y + yCollisionBoxOffset, collisionBoxWidth, collisionBoxHeight);
+		
 		speed = 2;
 	}
 	
-	float targetX, targetY;
-	boolean attacking;
-	
 	public void render(Graphics g, int xOffset, int yOffset) {
-		BufferedImage sprite = facingRight ? animations[0][aniIndex] : mirroredAnimations[0][aniIndex];
+		BufferedImage sprite = facingRight ? animations[aniIndex][0] : mirroredAnimations[aniIndex][0];
 		g.drawImage(sprite, (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);
 		
 		drawHealthBar(g, xOffset, yOffset);
@@ -50,39 +56,32 @@ public class Ghost extends Enemy{
 			drawHitbox(g, xOffset, yOffset);
 	}
 	
-	
-	// temp vars
-	int i = 0;
-	float[] currentAttackVector;
+	public void updateAttack() {
+		if(!attacking) {
+			if(checkLineOfSight(playerHitbox)) {
+				attacking = true;
+				currentAttackVector = HelpMethods.GetVector(playerHitbox.x + playerHitbox.width/2, playerHitbox.y + playerHitbox.height/2, 
+						hitbox.x + hitbox.width/2, hitbox.y + hitbox.height/2);
+			}
+		}else {
+			if(aniTick > totalAttackTime) {
+				//attacking = false;
+				currentAttackVector = HelpMethods.GetVector(playerHitbox.x + playerHitbox.width/2, playerHitbox.y + playerHitbox.height/2, 
+						hitbox.x + hitbox.width/2, hitbox.y + hitbox.height/2);
+				aniTick = 0;
+			}else {
+				speed = aniTick < totalAttackTime/2 ? aniTick/speedDivisor : (totalAttackTime - aniTick)/speedDivisor;
+				moveTowardsPos(speed, currentAttackVector, TOWARDS);
+				aniTick++;
+			}
+		}
+	}
 	
 	public void update() {
 		updateAnimationTick(6, 40);
+		updateAttack();
+		damagePlayer();
 		
-		
-		if(!attacking) {
-			if(checkLineOfSight(player)) {
-				attacking = true;
-				
-				currentAttackVector = HelpMethods.GetVector(player.x + player.width/2, player.y + player.height/2, 
-						hitbox.x + hitbox.width/2, hitbox.y + hitbox.height/2);
-				
-			}
-		}else {
-			if(i > 500) {
-				//attacking = false;
-				currentAttackVector = HelpMethods.GetVector(player.x + player.width/2, player.y + player.height/2, 
-						hitbox.x + hitbox.width/2, hitbox.y + hitbox.height/2);
-				i = 0;
-			}else {
-				
-				speed = i < 250 ? i/20 : (500 - i)/20;
-				
-				moveTowardsPos(speed, currentAttackVector, TOWARDS);
-				i++;
-				System.out.println(i);
-			}
-		}
-		// maybe refactor
 		moving = false;
 	}
 

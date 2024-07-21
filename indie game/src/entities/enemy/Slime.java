@@ -1,13 +1,15 @@
-package entities;
+package entities.enemy;
 
 import static utilz.Constants.SlimeConstants.*; 
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+import entities.Enemy;
 import gamestates.Overworld;
 import main.Game;
 import utilz.HelpMethods;
+import utilz.ImageHelpMethods;
 import utilz.LoadSave;
 
 import static utilz.Constants.Directions.*;
@@ -28,14 +30,15 @@ public class Slime extends Enemy{
 		super(x, y, width, height);
 		
 		init();
-		
-		loadAnimations("npc/enemy/slime.png", 6, 3);
-		
-		initHitbox(x, y, hitboxWidth, hitboxHeight);
-		initCollisionBox(x + xCollisionBoxOffset, y + yCollisionBoxOffset, collisionBoxWidth, collisionBoxHeight);
 	}
 	
 	private void init() {
+		animations = ImageHelpMethods.GetDefaultSizeSprites("npc/enemy/slime.png", 6, 3);
+		mirroredAnimations = ImageHelpMethods.GetMirroredSprites(animations);
+		
+		initHitbox(x, y, hitboxWidth, hitboxHeight);
+		initCollisionBox(x + xCollisionBoxOffset, y + yCollisionBoxOffset, collisionBoxWidth, collisionBoxHeight);
+		
 		speed = 2;
 	}
 	
@@ -52,7 +55,7 @@ public class Slime extends Enemy{
 	}
 	
 	public void render(Graphics g, int xOffset, int yOffset) {
-		BufferedImage sprite = facingRight ? animations[action][aniIndex] : mirroredAnimations[action][aniIndex];
+		BufferedImage sprite = facingRight ? animations[aniIndex][action] : mirroredAnimations[aniIndex][action];
 		g.drawImage(sprite, (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);
 		
 		drawHealthBar(g, xOffset, yOffset);
@@ -66,8 +69,10 @@ public class Slime extends Enemy{
 	public void update() {
 		updateAnimationTick(GetSpriteAmount(action), GetSpriteDuration(action));
 		
-		if(checkLineOfSight(player))
-			moveTowardsPos(speed, HelpMethods.GetVector(player.x + player.width/2, player.y + player.height/2, hitbox.x + hitbox.width/2, hitbox.y + hitbox.height/2), TOWARDS);
+		if(checkLineOfSight(playerHitbox))
+			moveTowardsPos(speed, HelpMethods.GetVector(playerHitbox.x + playerHitbox.width/2, playerHitbox.y + playerHitbox.height/2, hitbox.x + hitbox.width/2, hitbox.y + hitbox.height/2), TOWARDS);
+		
+		damagePlayer();
 		
 		setAnimation();
 		

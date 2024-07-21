@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import entities.Enemy;
-import entities.Entity;
-import entities.Ghost;
-import entities.Player;
-import entities.Slime;
+import entities.enemy.Entity;
+import entities.enemy.Ghost;
+import entities.enemy.Slime;
+import entities.player.Player;
 import location.ExitZone;
 import location.LocationManager;
 import main.Game;
@@ -47,7 +47,7 @@ public class Overworld extends State implements Statemethods{
 	
 	private void init() {
 		locationManager = new LocationManager(game);
-		player = new Player( 6 * Game.TILES_SIZE, 10 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE));
+		player = new Player( 2 * Game.TILES_SIZE, 2 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE));
 		loadLocation(0);	// first map loaded
 	}
 
@@ -58,6 +58,8 @@ public class Overworld extends State implements Statemethods{
 		
 		for(Enemy enemy : enemies)
 			enemy.render(g, xLocationOffset, yLocationOffset);
+		
+		player.getHud().draw(g);
 	}
 	
 	@Override
@@ -82,13 +84,8 @@ public class Overworld extends State implements Statemethods{
 		for(Enemy enemy : enemies)
 			enemy.update();
 		
-		if(player.isInBufferFrames()) {
-			System.out.println(i);
-			i++;
-		}else
-			i = 0;
+		player.getBook().updatePlayerPos((int) (player.getHitbox().x - xLocationOffset), (int) (player.getHitbox().y - yLocationOffset));
 	}
-	int i = 0;
 	
 	private void updateEnemyList() {
 	    Iterator<Enemy> iterator = enemies.iterator();
@@ -126,14 +123,19 @@ public class Overworld extends State implements Statemethods{
 			enemies.add(new Ghost(22 * Game.TILES_SIZE, 19 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
 			enemies.add(new Slime(7 * Game.TILES_SIZE, 4 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
 			enemies.add(new Slime(8 * Game.TILES_SIZE, 5 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
+			
+			enemies.add(new Ghost(34 * Game.TILES_SIZE, 12 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
+			enemies.add(new Slime(33 * Game.TILES_SIZE, 11 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
+			enemies.add(new Slime(30 * Game.TILES_SIZE, 10 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
 			characters.addAll(enemies);
 			
 			for(Enemy enemy : enemies) {
 				enemy.loadPlayerHitbox(player.getHitbox());
+				enemy.loadPlayer(player);
 			}
 			
 		}else if(locationIndex == 1) {
-			
+			initLocationCharacters();
 		}
 		
 		// set location in manager
@@ -154,6 +156,10 @@ public class Overworld extends State implements Statemethods{
 		maxTilesOffsetY = locationTilesHigh - Game.TILES_IN_HEIGHT;
 		maxLocationOffsetX = maxTilesOffsetX * Game.TILES_SIZE;
 		maxLocationOffsetY = maxTilesOffsetY * Game.TILES_SIZE;
+		
+		// update book pos
+		checkCloseToBorder();
+		player.getBook().setBookPos((int) (player.getHitbox().x - xLocationOffset), (int) (player.getHitbox().y - yLocationOffset));
 	}
 	
 	// calculates screen offset values when close to border
@@ -193,35 +199,29 @@ public class Overworld extends State implements Statemethods{
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		
-		// also make sure its mb1 for now?
-		if(player.isInBufferFrames()) {
-			
-			if(player.isAttacking())
-				player.setNextAttackSelected(true);
-			else
-				player.increaseAttackIndex();
-		}
-		
 		// attack
-		if(!player.isAttacking()) {
-			
-			if(!player.isInBufferFrames()) {
-				player.setCurrentAttackIndex(0);
+		if(e.getButton() == MouseEvent.BUTTON1) {
+			if(player.isInBufferFrames()) {
+				if(player.isAttacking())
+					player.setNextAttackSelected(true);
+				else
+					player.increaseAttackIndex();
 			}
 			
-			if(e.getButton() == MouseEvent.BUTTON1) {
-				player.setMouseVars(e.getX(), e.getY());
-				player.setLocationOffset(xLocationOffset, yLocationOffset);
+			if(!player.isAttacking()) {
+				if(!player.isInBufferFrames())
+					player.setCurrentAttackIndex(0);
 				
+				player.setLocationOffset(xLocationOffset, yLocationOffset);
 				player.setAttacking(true);
 			}
 		}
 		
 		// flamethrower
-		if(!player.isUsingSpell())
-			if(e.getButton() == MouseEvent.BUTTON3)
-				player.getFlamethrower().initSpellUseVars(e.getX(), e.getY(), xLocationOffset, yLocationOffset);
+		if(e.getButton() == MouseEvent.BUTTON3)
+			if(!player.isUsingSpell())
+				if(player.getMana() >= player.getFlamethrower().getManaUsage())
+					player.getFlamethrower().initSpellUseVars(e.getX(), e.getY(), xLocationOffset, yLocationOffset);
 	}
 
 	@Override
@@ -267,7 +267,8 @@ public class Overworld extends State implements Statemethods{
 			
 		// cast water ring
 		case KeyEvent.VK_Q:
-			player.getWaterRing().initSpellUseVars();
+			if(player.getMana() >= player.getWaterRing().getManaUsage())
+				player.getWaterRing().initSpellUseVars();
 			break;
 		}
 	}
@@ -288,6 +289,14 @@ public class Overworld extends State implements Statemethods{
 		case KeyEvent.VK_D:
 			player.setRight(false);
 			break;
+			
+			
+		case KeyEvent.VK_O:
+			player.decreaseHealth(1);;
+			break;
+		case KeyEvent.VK_P:
+			player.decreaseHealth(3);;
+			break; 
 		}
 		
 	}

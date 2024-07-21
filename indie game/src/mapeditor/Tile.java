@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import graphics.GraphicsHelp;
+import main.Game;
 import utilz.Constants;
 import utilz.LoadSave;
 
@@ -36,7 +37,7 @@ public class Tile {
 	public void clearTile() {
 		this.spriteIndex = -1;
 		
-		this.sprite = new BufferedImage(TILE_SIZE, TILE_SIZE, BufferedImage.TYPE_INT_ARGB);
+		this.sprite = new BufferedImage(Game.TILES_DEFAULT_SIZE, Game.TILES_DEFAULT_SIZE, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = sprite.createGraphics();
         g2d.setColor(new Color(0, 0, 0, 200));
         g2d.drawRect(0, 0, sprite.getWidth(), sprite.getHeight());

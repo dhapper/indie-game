@@ -1,4 +1,4 @@
-package spells;
+package attacks;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import entities.Enemy;
-import entities.Player;
+import entities.player.Player;
 import gamestates.Overworld;
 import main.Game;
 import utilz.HelpMethods;
@@ -70,21 +70,21 @@ public class Flamethrower extends Spell implements SpellMethods{
 		Rectangle2D.Float offsetHitbox = null;
 		
 		for(Enemy enemy : player.getEnemyData()) {
-			
 			offsetHitbox = new Rectangle2D.Float(enemy.getHitbox().x - xOffset, enemy.getHitbox().y - yOffset,
 					enemy.getHitbox().width, enemy.getHitbox().height);
 			
 			if(player.getFlamethrower().getBounds().intersects(offsetHitbox)) {
-				
 				if(!enemy.isAffectedDuringSpell()) {
 					enemy.damageEnemy(1);
 					enemy.setAffectedDuringSpell(true);
 				}
 			}
 		}
+		
 	}
 	
 	public void initSpellUseVars(int mouseX, int mouseY, int xOffset, int yOffset) {
+		player.changeManaAmount(-manaUsage);
 		player.setUsingSpell(true);
 		player.getFlamethrower().setCastingSpell(true);
 		
@@ -195,7 +195,7 @@ public class Flamethrower extends Spell implements SpellMethods{
 		resetEnemyVars();
 	}
 
-	@Override
+
 	public void loadAnimations() {
 		growthSprites = new BufferedImage[5];
 		matureSprites = new BufferedImage[5];

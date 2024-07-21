@@ -10,7 +10,8 @@ public class Constants {
 	}
 	
 	public static class MapEditorConstants{
-		public static final int TILE_SIZE = 32;
+		
+		//public static final int MAP_TILE_SIZE = 32;
 		public static final int VISIBLE_MAP_TILE_WIDTH = 40;
 		public static final int VISIBLE_MAP_TILE_HEIGHT = 25;
 		
@@ -89,16 +90,25 @@ public class Constants {
 		public static final int IDLE = 0;
 		public static final int WALKING = 2;
 		public static final int ATTACKING = 8;
-		public static final int WATER_SPELL = 2;
+		public static final int CASTING_SPELL = 4;
+		
+		public static final int IDLE_B = 9;
+		public static final int WALKING_B = 10;
+		public static final int CASTING_SPELL_B = 12;
 		
 		public static int GetSpriteAmount(int player_action) {
 			switch(player_action) {
 			case IDLE:
+			case IDLE_B:
 				return 2;
 			case WALKING:
+			case WALKING_B:
 				return 4;
 			case ATTACKING:
 				return 8;
+			case CASTING_SPELL:
+			case CASTING_SPELL_B:
+				return 6;
 			default:
 				return 0;	
 			}
@@ -106,15 +116,21 @@ public class Constants {
 		
 		static int atk = 5;
 		static int walk = 20;
+		static int cast = 10; 
 		
 		public static int[] GetSpriteDuration(int player_action) {
 			switch(player_action) {
 			case IDLE:
+			case IDLE_B:
 				return new int[] {120, 60};
 			case WALKING:
+			case WALKING_B:
 				return new int[] {walk, walk, walk, walk};
 			case ATTACKING:
 				return new int[] {atk, atk, atk, atk*2, atk*2, atk*2, atk, atk, atk};
+			case CASTING_SPELL:
+			case CASTING_SPELL_B:
+				return new int[] {cast, cast, cast, cast, cast, cast};
 			default:
 				return null;	
 			}

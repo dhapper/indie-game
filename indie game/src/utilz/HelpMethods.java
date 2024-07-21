@@ -5,13 +5,22 @@ import java.awt.geom.Rectangle2D.Float;
 import java.util.ArrayList;
 
 import entities.Enemy;
-import entities.Entity;
-import entities.Player;
+import entities.enemy.Entity;
+import entities.player.Player;
 import main.Game;
 
 import static utilz.Constants.MapEditorConstants.*;
 
 public class HelpMethods {
+	
+	public static boolean IsSpecificHitboxThere(Entity entity, Rectangle2D.Float hitbox, float xSpeed, float ySpeed) {
+		Rectangle2D.Float nextHitbox = new Rectangle2D.Float(entity.getHitbox().x + xSpeed, entity.getHitbox().y + ySpeed,
+				entity.getHitbox().width, entity.getHitbox().height);
+		
+		if(nextHitbox.intersects(hitbox))
+			return true;
+		return false;
+	}
 	
 	public static boolean IsEntityThere(Entity entity, float xSpeed, float ySpeed, ArrayList<Entity> entityList) {
 		Rectangle2D.Float nextHitbox = new Rectangle2D.Float(entity.getHitbox().x + xSpeed, entity.getHitbox().y + ySpeed,
@@ -19,7 +28,7 @@ public class HelpMethods {
 		
 		for(Entity e : entityList)
 			if(e != entity)
-				if(e.getHitbox().intersects(nextHitbox))
+				if(e.getHitbox().intersects(nextHitbox) && e.isAlive())
 						return true;
 		return false;
 	}

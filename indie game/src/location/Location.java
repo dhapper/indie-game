@@ -85,12 +85,12 @@ public class Location {
         Rectangle exitZoneRect;
         switch (index) {
             case 0:
+            	exitZoneRect = new Rectangle(39 * Game.TILES_SIZE, 24 * Game.TILES_SIZE, Game.TILES_SIZE, Game.TILES_SIZE);
+                exitZones.add(new ExitZone(exitZoneRect, 1, 2 * Game.TILES_SIZE, 4 * Game.TILES_SIZE));
                 break;
             case 1:
-                exitZoneRect = new Rectangle(200, 200, 100, 100);
-                exitZones.add(new ExitZone(exitZoneRect, 0, 300, 300));
-                exitZoneRect = new Rectangle(400, 200, 100, 100);
-                exitZones.add(new ExitZone(exitZoneRect, 0, 500, 500));
+            	exitZoneRect = new Rectangle(1 * Game.TILES_SIZE, 6 * Game.TILES_SIZE, Game.TILES_SIZE, Game.TILES_SIZE);
+                exitZones.add(new ExitZone(exitZoneRect, 0, 2 * Game.TILES_SIZE, 4 * Game.TILES_SIZE));
                 break;
         }
     }

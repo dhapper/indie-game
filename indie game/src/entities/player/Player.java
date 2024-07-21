@@ -1,16 +1,29 @@
-package entities;
+package entities.player;
 
-import static utilz.Constants.PlayerConstants.*; 
+import static utilz.Constants.PlayerConstants.*;
 
+import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
+
+import attacks.Attack;
+import attacks.Flamethrower;
+import attacks.WaterRing;
+import entities.Enemy;
+import entities.enemy.Entity;
 import gamestates.Overworld;
+import graphics.GraphicsHelp;
 import main.Game;
-import spells.Flamethrower;
-import spells.WaterRing;
+import utilz.Constants;
 import utilz.HelpMethods;
+import utilz.ImageHelpMethods;
+import utilz.LoadSave;
 
 import static utilz.Constants.Attack.*;
 import static utilz.Constants.Directions.*;
@@ -31,8 +44,8 @@ public class Player extends Entity{
 	private boolean left, up, right, down;
 	private float playerSpeed = 0.85f * Game.SCALE;
 	private int movingDirection;
-	private int mouseX, mouseY;
 	private int xLocationOffset, yLocationOffset;
+	private boolean facingForward = true;
 	
 	// status
 	private boolean usingSpell = false;
@@ -41,29 +54,52 @@ public class Player extends Entity{
 	// spells
 	private WaterRing waterRing;
 	private Flamethrower flamethrower;
+	private boolean castingSpellAnimation;
 	
-	private Attack attack1 = new Attack(this, BASIC, false);
-	private Attack attack2 = new Attack(this, BASIC, true);
-	private Attack finisher = new Attack(this, FINISHER, false);
-	private Attack[] attacks = {attack1, attack2, finisher};
+	// attacks
+	private Attack updatedAttack = new Attack(this, true);
+	private Attack updatedAttack2 = new Attack(this, false);
+	private Attack[] attacks = {updatedAttack, updatedAttack2};
 	private int currentAttackIndex = 0;
 	private boolean inBufferFrames = false;
 	private boolean nextAttackSelected = false;
+	private int bufferFrameTickCounter = 0;
+	
+	// stats
+	private int health = 5;
+	private int maxHealth = health;
+	private int mana = 3;
+	private int maxMana = mana;
+	
+	// invincibility frames
+	private boolean invincible;
+	private int invincibilityFrames;
+	private int totalInvincibilityFrames = 300;
+	
+	// objects
+	private Book book;
+	private HUD hud;
 	
 	public Player(float x, float y, int width, int height) {
 		super(x, y, width, height);
-		
 		this.name = "Dhaarshan";
 		
-		this.waterRing = new WaterRing(this);
-		this.flamethrower = new Flamethrower(this);
-		
-		loadAnimations("player/redHood.png", 8, 9);
+		init();
+	}
+	
+	public void init() {
+		animations = ImageHelpMethods.GetDefaultSizeSprites("player/redHoodCustom.png", 8, 13);
+		mirroredAnimations = ImageHelpMethods.GetMirroredSprites(animations);
 		
 		initHitbox(x, y, hitboxWidth, hitboxHeight);
 		initCollisionBox(x + xCollisionBoxOffset, y + yCollisionBoxOffset, collisionBoxWidth, collisionBoxHeight);
+		
+		this.waterRing = new WaterRing(this);
+		this.flamethrower = new Flamethrower(this);
+		this.book = new Book(this, 0, 0, 10, 10);
+		this.hud = new HUD(this);
 	}
-	
+
 	public void update() {
 		updateAnimationTick();
 		
@@ -83,6 +119,9 @@ public class Player extends Entity{
 				nextAttackSelected = false;
 			}
 		}
+		
+		book.update();
+		hud.update();
 	}
 	
 	public void render(Graphics g, int xOffset, int yOffset) {
@@ -92,17 +131,27 @@ public class Player extends Entity{
 		if(flamethrower.isCastingSpell())
 			flamethrower.draw(g, xOffset, yOffset);
 
-		BufferedImage sprite = facingRight ? animations[action][aniIndex] : mirroredAnimations[action][aniIndex];
-		g.drawImage(sprite, (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);
+		// book behind
+		if(book.getBookY() <= hitbox.y - yOffset)
+			book.draw(g);
+		
+		BufferedImage sprite = facingRight ? animations[aniIndex][action] : mirroredAnimations[aniIndex][action];
+		if(invincible)
+			sprite = GraphicsHelp.DecreaseAlpha(sprite, 1.0f*invincibilityFrames/totalInvincibilityFrames);
+
+		g.drawImage(sprite, (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);	
 		
 		if(attacking) {
 			attacks[currentAttackIndex].loadDirection(movingDirection);
 			attacks[currentAttackIndex].draw(g, xOffset, yOffset);
 		}
 		
+		// book infront
+		if(book.getBookY() > hitbox.y - yOffset)
+			book.draw(g);
+		
 		if(Overworld.SHOW_HITBOXES)
 			drawHitbox(g, xOffset, yOffset);
-		
 	}
 	
 	public void updatePlayerPos(int x, int y) {
@@ -112,9 +161,15 @@ public class Player extends Entity{
 		collisionBox.y = y + yCollisionBoxOffset;
 	}
 	
-	
-	int bufferFrameTickCounter = 0;
 	private void updateAnimationTick() {
+		
+		if(invincible) {
+			invincibilityFrames++;
+			if(invincibilityFrames > totalInvincibilityFrames) {
+				invincible = false;
+				invincibilityFrames = 0;
+			}
+		}
 		
 		if(bufferFrameTickCounter < BUFFER_FRAMES * 2 && inBufferFrames) {
 			bufferFrameTickCounter++;
@@ -130,6 +185,7 @@ public class Player extends Entity{
 			if(aniIndex >= GetSpriteAmount(action)) {	// check if animation is complete
 				aniIndex = 0;
 				//attacking = false;
+				castingSpellAnimation = false;
 			}
 		}
 		
@@ -146,13 +202,16 @@ public class Player extends Entity{
 		int startAni = action;
 		
 		if(moving)
-			action = WALKING;
+			action = facingForward ? WALKING : WALKING_B;
 		else
-			action = IDLE;
+			action = facingForward ? IDLE : IDLE_B;;
+		
+		if(castingSpellAnimation)
+			action = facingForward ? CASTING_SPELL : CASTING_SPELL_B;;
 		
 		// need to update this
-//		if(attacking)
-//			action = ATTACKING;
+		if(attacking)
+			action = facingForward ? CASTING_SPELL : CASTING_SPELL_B;
 		
 		if(startAni !=  action)
 			resetAniTick();
@@ -165,6 +224,9 @@ public class Player extends Entity{
 
 	private void updatePos() {
 		moving = false;
+		
+		if(action == CASTING_SPELL)
+			return;
 		
 		if(!left && !right && !up && !down)
 			return;
@@ -194,7 +256,7 @@ public class Player extends Entity{
 	        		hitbox.x += xSpeed;
 		            collisionBox.x += xSpeed;
 		            moving = true;
-		            updateFacingDirection(xSpeed, TOWARDS);
+		            updateFacingDirectionX(xSpeed, TOWARDS);
 	        	}
 	        }
 	    }
@@ -206,12 +268,20 @@ public class Player extends Entity{
 		            hitbox.y += ySpeed;
 		            moving = true;
 		            collisionBox.y += ySpeed;
+		            updateFacingDirectionY(ySpeed, TOWARDS);
 	        	}
 	        }
 	    }
 		
 	    
 	    updateMovingDirection(xSpeed, ySpeed);
+	}
+	
+	public void updateFacingDirectionY(float ySpeed, int mode) {
+		if(mode == TOWARDS)
+			facingForward = ySpeed > 0 ? true : false;
+		else if(mode == AWAY)
+			facingForward = ySpeed > 0 ? false : true;
 	}
 	
 	private void updateMovingDirection(float xSpeed, float ySpeed) {
@@ -245,24 +315,39 @@ public class Player extends Entity{
 		down = false;
 	}
 	
-	public void setMouseVars(int x, int y) {
-		this.mouseX = x;
-		this.mouseY = y;
-	}
-	
 	public void setLocationOffset(int xLocationOffset, int yLocationOffset) {
 		this.xLocationOffset = xLocationOffset;
 		this.yLocationOffset = yLocationOffset;
 	}
 	
 	public void increaseAttackIndex() {
-		currentAttackIndex = (currentAttackIndex + 1) % 3;
+		currentAttackIndex = (currentAttackIndex + 1) % attacks.length;
+	}
+	
+	public void decreaseHealth(int damage) {
+		health -= damage;
+		health = Math.max(health, 0);
+		hud.updateHearts();
+	}
+	
+	public void changeManaAmount(int manaDelta) {
+		mana += manaDelta;
+		mana = Math.max(mana, 0);
+		mana = Math.min(mana, maxMana);
 	}
 	
 	// getters and setters...
 	
 	public void setAttacking(boolean attacking) {
 		this.attacking = attacking;
+	}
+
+	public boolean isInvincible() {
+		return invincible;
+	}
+
+	public void setInvincible(boolean invincible) {
+		this.invincible = invincible;
 	}
 
 	public boolean isLeft() {
@@ -303,6 +388,9 @@ public class Player extends Entity{
 
 	public void setUsingSpell(boolean usingSpell) {
 		this.usingSpell = usingSpell;
+		
+		if(usingSpell)
+			castingSpellAnimation = true;
 	}
 
 	public WaterRing getWaterRing() {
@@ -353,5 +441,32 @@ public class Player extends Entity{
 		this.nextAttackSelected = nextAttackSelected;
 	}
 
+	public Book getBook() {
+		return book;
+	}
 	
+	public boolean isFacingForward() {
+		return facingForward;
+	}
+
+	public int getHealth() {
+		return health;
+	}
+
+	public int getMaxHealth() {
+		return maxHealth;
+	}
+	
+	public int getMana() {
+		return mana;
+	}
+
+	public int getMaxMana() {
+		return maxMana;
+	}
+
+	public HUD getHud() {
+		return hud;
+	}
+
 }

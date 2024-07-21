@@ -1,23 +1,21 @@
-package spells;
+package attacks;
 
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
 
 import entities.Enemy;
-import entities.Entity;
-import entities.Player;
+import entities.enemy.Entity;
+import entities.player.Player;
 
 public abstract class Spell {
 
-	
 	protected Player player;
 	protected String name;
-	protected BufferedImage[] sprites;
+	protected BufferedImage[][] sprites;
 	protected boolean castingSpell;
 	protected Shape bounds;
-	
+	protected int manaUsage = 1;
 	protected int aniTick, aniIndex;
-	
 	
 	public Spell(Player player) {
 		this.player = player;
@@ -33,7 +31,6 @@ public abstract class Spell {
 		return castingSpell;
 	}
 
-
 	public void setCastingSpell(boolean castingSpell) {
 		this.castingSpell = castingSpell;
 	}
@@ -42,5 +39,8 @@ public abstract class Spell {
 		return bounds;
 	}
 	
+	public int getManaUsage() {
+		return manaUsage;
+	}
 	
 }

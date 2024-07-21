@@ -23,7 +23,7 @@ public class LocationManager {
 
         initLocations();
     }
-
+    
     private void initLocations() {
         locations = new ArrayList<>();
         // keep locations ordered
@@ -40,7 +40,7 @@ public class LocationManager {
 
             sprites.add(new BufferedImage[width * height]);
             for (int i = 0; i < width * height; i++) {
-                sprites.get(sprites.size() - 1)[i] = sheet.getSubimage((i % width) * Constants.MapEditorConstants.TILE_SIZE, (i / width) * Constants.MapEditorConstants.TILE_SIZE, Constants.MapEditorConstants.TILE_SIZE, Constants.MapEditorConstants.TILE_SIZE);
+                sprites.get(sprites.size() - 1)[i] = sheet.getSubimage((i % width) * Game.TILES_DEFAULT_SIZE, (i / width) * Game.TILES_DEFAULT_SIZE, Game.TILES_DEFAULT_SIZE, Game.TILES_DEFAULT_SIZE);
             }
         }
     }
