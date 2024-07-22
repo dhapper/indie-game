@@ -2,13 +2,14 @@ package mapeditor;
 
 import java.awt.image.BufferedImage;
 
+
 import javax.swing.SwingUtilities;
 
 import graphics.GraphicsHelp;
 import main.Game;
 import utilz.LoadSave;
 
-import static utilz.Constants.MapEditorConstants.*;
+import static mapeditor.EditorConstants.MapEditorConstants.*;
 
 public class SpriteSheets {
 	

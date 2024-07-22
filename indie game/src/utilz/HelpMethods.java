@@ -1,6 +1,7 @@
 package utilz;
 
 import java.awt.geom.Rectangle2D;
+
 import java.awt.geom.Rectangle2D.Float;
 import java.util.ArrayList;
 
@@ -9,7 +10,7 @@ import entities.enemy.Entity;
 import entities.player.Player;
 import main.Game;
 
-import static utilz.Constants.MapEditorConstants.*;
+import static mapeditor.EditorConstants.MapEditorConstants.*;
 
 public class HelpMethods {
 	

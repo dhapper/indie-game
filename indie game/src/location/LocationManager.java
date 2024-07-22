@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import main.Game;
+import mapeditor.EditorConstants;
 import utilz.Constants;
 import utilz.LoadSave;
 
@@ -48,8 +49,8 @@ public class LocationManager {
     private void importTilesets() {
         tilesets = new ArrayList<>();
 
-        for (int layer : Constants.MapEditorConstants.LAYER_ORDER)
-            tilesets.add(LoadSave.LoadImage("tilesets/" + Constants.MapEditorConstants.GetSpriteSheetFileName(layer)));
+        for (int layer : EditorConstants.MapEditorConstants.LAYER_ORDER)
+            tilesets.add(LoadSave.LoadImage("tilesets/" + EditorConstants.MapEditorConstants.GetSpriteSheetFileName(layer)));
     }
 
     public BufferedImage getSprite(int layer, int index) {

@@ -2,41 +2,16 @@ package utilz;
 
 public class Constants {
 
+	public static class EnemyIndex{
+		public static final int SLIME = 0;
+		public static final int GHOST = 1;
+	}
+	
 	public static class Attack{
 		public static final int BASIC = 0;
 		public static final int FINISHER = 1;
 		
 		public static final int BUFFER_FRAMES = 30;
-	}
-	
-	public static class MapEditorConstants{
-		
-		//public static final int MAP_TILE_SIZE = 32;
-		public static final int VISIBLE_MAP_TILE_WIDTH = 40;
-		public static final int VISIBLE_MAP_TILE_HEIGHT = 25;
-		
-		// must order int values and array correctly, need to fix this
-		public static final int GROUND_SPRITES = 0;
-		public static final int ANIMATED_SPRITES = 1;
-		public static final int OVERLAP_SPRITES = 2;
-		public static final int COLLISION_SPRITES = 3;
-		
-		public static final int[] LAYER_ORDER = {GROUND_SPRITES, ANIMATED_SPRITES, OVERLAP_SPRITES, COLLISION_SPRITES};
-		public static final int[] COLLISION_LAYERS = {ANIMATED_SPRITES, COLLISION_SPRITES};
-		
-		public static String GetSpriteSheetFileName(int layer) {
-			switch (layer) {
-			case GROUND_SPRITES:
-				return "GROUND_SPRITES.png";
-			case OVERLAP_SPRITES:
-				return "OVERLAP_SPRITES.png";
-			case COLLISION_SPRITES:
-				return "COLLISION_SPRITES.png";
-			case ANIMATED_SPRITES:
-				return "ANIMATED_SPRITES.png";
-			}
-			return null;
-		}
 	}
 	
 	public static class Directions{

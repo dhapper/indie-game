@@ -1,6 +1,8 @@
-package mapeditor;
+package mapeditor.inputs;
 
 import java.awt.event.MouseEvent;
+
+
 
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -11,8 +13,10 @@ import javax.swing.JPanel;
 import gamestates.GameState;
 import main.Game;
 import main.GamePanel;
+import mapeditor.*;
+import mapeditor.panel.*;
 
-import static utilz.Constants.MapEditorConstants.*;
+import static mapeditor.EditorConstants.MapEditorConstants.*;
 
 public class MouseInputs implements MouseListener, MouseMotionListener{
 
@@ -77,33 +81,15 @@ public class MouseInputs implements MouseListener, MouseMotionListener{
 		else if(e.getY() < 0 || e.getY() > MapEditor.HEIGHT * Game.TILES_DEFAULT_SIZE)
 			return;
 		
-		// switch layer
-		if(KeyboardInputs.keyHeld) {
-			if (KeyboardInputs.key == '`' || KeyboardInputs.key == '0') {
-				MapEditor.LAYER = 0;
-			}else if(KeyboardInputs.key == '1') {
-				MapEditor.LAYER = 1;
-			}else if(KeyboardInputs.key == '2') {
-				MapEditor.LAYER = 2;
-			}else if(KeyboardInputs.key == '3') {
-				MapEditor.LAYER = 3;
-			}
-			panel.repaint();
-		}
-		
-		// switch selected sprite / draw tile on initial click
 		if (panel instanceof MapPanel) {
-			tiles[y][x].changeSprite(SpritePanel.SELECTED_SPRITE);
+			if(ToolPanel.SELECTED_TOOL == ToolPanel.PAINT_BRUSH)
+				tiles[y][x].changeSprite(SpritePanel.SELECTED_SPRITE);
 		}else if(panel instanceof SpritePanel) {
-	    	//switch(MapEditor.LAYER) {
-	    	//case GROUND_SPRITES:
-			//case COLLISION_SPRITES:
-				SpriteSheetData spriteSheetData = MapEditor.SPRITE_LAYERS.get(MapEditor.LAYER);
-				int index = x + (y * spriteSheetData.getWidth());
-				if(index < spriteSheetData.getWidth() * spriteSheetData.getHeight())
-					SpritePanel.setSelectedSprite(index);
-				//break;
-	    	//}
+			SpriteSheetData spriteSheetData = MapEditor.SPRITE_LAYERS.get(MapEditor.LAYER);
+			int index = x + (y * spriteSheetData.getWidth());
+			if(index < spriteSheetData.getWidth() * spriteSheetData.getHeight())
+				SpritePanel.setSelectedSprite(index);
+			
 		}
 		
 		// clear tile on left click
@@ -113,35 +99,51 @@ public class MouseInputs implements MouseListener, MouseMotionListener{
 	    }
 		
 		// save map
-		if(KeyboardInputs.keyHeld) {
-			if (KeyboardInputs.key == 's' || KeyboardInputs.key == 'S') {
-				new SaveMapWindow();
-			return;	
+		if(ToolPanel.SELECTED_TOOL == ToolPanel.SAVE){
+			System.out.println("save");
+			new SaveMapWindow();
+			panel.repaint();
+			return;
+		}
+		
+		// mirror selected
+		if (panel instanceof MapPanel) {
+			if(ToolPanel.SELECTED_TOOL == ToolPanel.MIRROR){
+				tiles[x][y].setMirrored(!tiles[x][y].isMirrored());
+				tiles[x][y].changeSprite(tiles[x][y].getSpriteIndex());
 			}
 		}
 		
-		// fill background
-		if(KeyboardInputs.keyHeld) {
-			if (KeyboardInputs.key == 'b' || KeyboardInputs.key == 'B') {
+		// set background
+		if(MapEditor.LAYER == 0) {
+			if(ToolPanel.SELECTED_TOOL == ToolPanel.SET_BG) {
 				for(int i = 0; i < tiles.length; i ++) {
 					for(int j = 0; j < tiles[0].length; j ++) {
 						tiles[i][j].changeSprite(SpritePanel.SELECTED_SPRITE); 
 					}
 				}
-		    }
+			}
 		}
 		
 		// fill selected tile
-		if(KeyboardInputs.keyHeld) {
-			if (KeyboardInputs.key == 'c' || KeyboardInputs.key == 'C') {
-				for(int i = 0; i < tiles.length; i ++) {
-					for(int j = 0; j < tiles[0].length; j ++) {
-						if(tiles[i][j].getSpriteIndex() == spriteIndex)
-							tiles[i][j].changeSprite(SpritePanel.SELECTED_SPRITE); 
+		if(ToolPanel.SELECTED_TOOL == ToolPanel.FILL) {
+			for(int i = 0; i < tiles.length; i ++) {
+				for(int j = 0; j < tiles[0].length; j ++) {
+					if(tiles[i][j].getSpriteIndex() == spriteIndex) {
+						tiles[i][j].changeSprite(SpritePanel.SELECTED_SPRITE);
 					}
 				}
-		    }
-		}
+			}
+	    }
+		
+//		for(int i = 0; i < tiles.length; i ++) {
+//			for(int j = 0; j < tiles[0].length; j ++) {
+//				System.out.print(tiles[i][j].getSpriteIndex() + " ");
+//			}
+//			System.out.println();
+//		}
+		
+		panel.getMapEditor().getToolPanel().updateTool(ToolPanel.PAINT_BRUSH);
 		
 		panel.repaint();
 		

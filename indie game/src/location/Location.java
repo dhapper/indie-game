@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import graphics.Animation;
 import main.Game;
+import mapeditor.EditorConstants;
 import utilz.Constants;
 
 public class Location {
@@ -27,7 +28,7 @@ public class Location {
     private void initAnimations() {
         for (int y = 0; y < mapData.get(0).length; y++) {
             for (int x = 0; x < mapData.get(0)[0].length; x++) {
-                int index = getSpriteIndex(Constants.MapEditorConstants.ANIMATED_SPRITES, x, y);
+                int index = getSpriteIndex(EditorConstants.MapEditorConstants.ANIMATED_SPRITES, x, y);	// dont like this
                 if (index != -1) {
                     animations[y][x] = new Animation("ANIMATED_SPRITES.png", 0, 9, 20); // Adjust params as needed
                 }
@@ -46,11 +47,11 @@ public class Location {
     }
 
     public void draw(Graphics g, int xOffset, int yOffset) {
-        for (int layer : Constants.MapEditorConstants.LAYER_ORDER) {
+        for (int layer : EditorConstants.MapEditorConstants.LAYER_ORDER) {
             for (int y = 0; y < mapData.get(0).length; y++) {
                 for (int x = 0; x < mapData.get(0)[0].length; x++) {
                     int index = getSpriteIndex(layer, x, y);
-                    if (layer == Constants.MapEditorConstants.ANIMATED_SPRITES && index != -1 && animations[y][x].isAnimating()) {
+                    if (layer == EditorConstants.MapEditorConstants.ANIMATED_SPRITES && index != -1 && animations[y][x].isAnimating()) {
                         g.drawImage(animations[y][x].getCurrentFrame(), x * Game.TILES_SIZE - xOffset, y * Game.TILES_SIZE - yOffset, Game.TILES_SIZE, Game.TILES_SIZE, null);
                     } else if (index != -1) {
                         g.drawImage(locationManager.getSprite(layer, index), x * Game.TILES_SIZE - xOffset, y * Game.TILES_SIZE - yOffset, Game.TILES_SIZE, Game.TILES_SIZE, null);

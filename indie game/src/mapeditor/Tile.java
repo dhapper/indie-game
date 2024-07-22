@@ -1,6 +1,7 @@
 package mapeditor;
 
 import java.awt.Color; 
+
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
@@ -9,12 +10,13 @@ import main.Game;
 import utilz.Constants;
 import utilz.LoadSave;
 
-import static utilz.Constants.MapEditorConstants.*;
+import static mapeditor.EditorConstants.MapEditorConstants.*;
 
 public class Tile {
 
 	private BufferedImage sprite;
 	private int spriteIndex = -1;
+	private boolean mirrored = false;
 	
 	
 	public Tile() {
@@ -32,6 +34,7 @@ public class Tile {
 			this.sprite = GraphicsHelp.DecreaseAlpha(MapEditor.SPRITE_LAYERS.get(MapEditor.LAYER).getSprites()[index], 0.70f);
 		else
 			this.sprite = MapEditor.SPRITE_LAYERS.get(MapEditor.LAYER).getSprites()[index];
+
 	}
 	
 	public void clearTile() {
@@ -53,6 +56,14 @@ public class Tile {
 
 	public int getSpriteIndex() {
 		return spriteIndex;
+	}
+
+	public boolean isMirrored() {
+		return mirrored;
+	}
+
+	public void setMirrored(boolean mirrored) {
+		this.mirrored = mirrored;
 	}
 	
 }

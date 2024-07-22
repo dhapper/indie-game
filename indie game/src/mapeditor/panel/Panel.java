@@ -1,16 +1,21 @@
-package mapeditor;
+package mapeditor.panel;
 
 import javax.swing.JPanel;
 
-import mapeditor.KeyboardInputs;
-import mapeditor.MouseInputs;
+import mapeditor.MapEditor;
+import mapeditor.inputs.KeyboardInputs;
+import mapeditor.inputs.MouseInputs;
 
 public abstract class Panel extends JPanel{
 	
 	MouseInputs mouseInputs;
 	KeyboardInputs keyboardInputs;
 
-	public Panel() {
+	MapEditor mapEditor;
+	
+	public Panel(MapEditor mapEditor) {
+		this.mapEditor = mapEditor;
+		
 		setFocusable(true);
 		
 		addKeyListener(new KeyboardInputs(this));
@@ -21,4 +26,10 @@ public abstract class Panel extends JPanel{
 		addMouseMotionListener(mouseInputs);
 		
 	}
+
+	public MapEditor getMapEditor() {
+		return mapEditor;
+	}
+	
+	
 }

@@ -1,7 +1,9 @@
-package mapeditor;
+package mapeditor.inputs;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
+import mapeditor.panel.Panel;
 
 public class KeyboardInputs implements KeyListener{
 
