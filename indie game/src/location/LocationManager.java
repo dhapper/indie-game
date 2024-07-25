@@ -3,6 +3,10 @@ package location;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+
+import entities.Enemy;
+import entities.enemy.Ghost;
+import entities.enemy.Slime;
 import main.Game;
 import mapeditor.EditorConstants;
 import utilz.Constants;
@@ -52,6 +56,30 @@ public class LocationManager {
         for (int layer : EditorConstants.MapEditorConstants.LAYER_ORDER)
             tilesets.add(LoadSave.LoadImage("tilesets/" + EditorConstants.MapEditorConstants.GetSpriteSheetFileName(layer)));
     }
+    
+	public ArrayList<Enemy> loadEnemies(ArrayList<Enemy> enemies) {
+		
+		enemies = new ArrayList<Enemy>();
+		
+		for (int y = 0; y < currentLocation.getMapData().get(0).length; y++) {
+            for (int x = 0; x < currentLocation.getMapData().get(0)[0].length; x++) {
+            	
+            	switch(currentLocation.getMapData().get(EditorConstants.MapEditorConstants.ENEMY_SPRITES)[y][x]) {
+            	case Constants.EnemyIndex.SLIME:
+            		enemies.add(new Slime(x * Game.TILES_SIZE, y * Game.TILES_SIZE, Game.TILES_SIZE, Game.TILES_SIZE));
+            		break;
+            	case Constants.EnemyIndex.GHOST:
+            		enemies.add(new Ghost(x * Game.TILES_SIZE, y * Game.TILES_SIZE, Game.TILES_SIZE, Game.TILES_SIZE));
+            		break;
+            	}
+            	
+            	
+            }
+		}
+		
+		return enemies;
+		
+	}
 
     public BufferedImage getSprite(int layer, int index) {
         return sprites.get(layer)[index];
@@ -64,6 +92,8 @@ public class LocationManager {
     public void update() {
         currentLocation.updateAnimations();
     }
+    
+    // getters and setters
 
     public Location getCurrentLocation() {
         return currentLocation;
@@ -76,4 +106,5 @@ public class LocationManager {
     public ArrayList<Location> getLocations() {
         return locations;
     }
+    
 }

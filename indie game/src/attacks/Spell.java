@@ -16,6 +16,7 @@ public abstract class Spell {
 	protected Shape bounds;
 	protected int manaUsage = 1;
 	protected int aniTick, aniIndex;
+	protected int damage = 1;
 	
 	public Spell(Player player) {
 		this.player = player;

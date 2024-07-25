@@ -11,6 +11,7 @@ import entities.enemy.Entity;
 import entities.enemy.Ghost;
 import entities.enemy.Slime;
 import entities.player.Player;
+import graphics.Shaders;
 import location.ExitZone;
 import location.LocationManager;
 import main.Game;
@@ -47,7 +48,7 @@ public class Overworld extends State implements Statemethods{
 	
 	private void init() {
 		locationManager = new LocationManager(game);
-		player = new Player( 2 * Game.TILES_SIZE, 2 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE));
+		player = new Player( 2 * Game.TILES_SIZE, 2 * Game.TILES_SIZE, Game.TILES_SIZE * 2, Game.TILES_SIZE * 2);
 		loadLocation(0);	// first map loaded
 	}
 
@@ -58,6 +59,13 @@ public class Overworld extends State implements Statemethods{
 		
 		for(Enemy enemy : enemies)
 			enemy.render(g, xLocationOffset, yLocationOffset);
+		
+		
+		//Shaders.draw(g, player.getHitbox().x - xLocationOffset, player.getHitbox().y  - yLocationOffset);
+		
+		if(locationManager.getCurrentLocation().getShader() ==  1) {
+			Shaders.caveShaders(g, (float) (player.getHitbox().getCenterX() - xLocationOffset), (float) (player.getHitbox().getCenterY() - yLocationOffset), 100, 100);
+		}
 		
 		player.getHud().draw(g);
 	}
@@ -116,30 +124,21 @@ public class Overworld extends State implements Statemethods{
 
 	private void loadLocation(int locationIndex) {
 		
-		// temporarily create enemys here
-		if(locationIndex == 0) {
-			initLocationCharacters();
-			enemies.add(new Ghost(20 * Game.TILES_SIZE, 18 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
-			enemies.add(new Ghost(22 * Game.TILES_SIZE, 19 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
-			enemies.add(new Slime(7 * Game.TILES_SIZE, 4 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
-			enemies.add(new Slime(8 * Game.TILES_SIZE, 5 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
-			
-			enemies.add(new Ghost(34 * Game.TILES_SIZE, 12 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
-			enemies.add(new Slime(33 * Game.TILES_SIZE, 11 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
-			enemies.add(new Slime(30 * Game.TILES_SIZE, 10 * Game.TILES_SIZE, (int) (32 * Game.SCALE), (int) (32 * Game.SCALE)));
-			characters.addAll(enemies);
-			
-			for(Enemy enemy : enemies) {
-				enemy.loadPlayerHitbox(player.getHitbox());
-				enemy.loadPlayer(player);
-			}
-			
-		}else if(locationIndex == 1) {
-			initLocationCharacters();
-		}
-		
 		// set location in manager
 		locationManager.setCurrentLocation(locationIndex);
+		
+		// load enemies
+		initLocationCharacters();
+		
+		enemies = locationManager.loadEnemies(enemies);
+		
+		characters.addAll(enemies);
+		
+		for(Enemy enemy : enemies) {
+			enemy.loadPlayerHitbox(player.getHitbox());
+			enemy.loadPlayer(player);
+		}
+	
 		
 		// update map data for player
 		player.loadMapData(locationManager.getCurrentLocation().getMapData(), characters, enemies);

@@ -85,6 +85,10 @@ public abstract class Enemy extends Entity{
 	}
 	
 	public boolean checkLineOfSight(Rectangle2D.Float player) {
+		
+		if(affectedDuringAttack)
+			return false;
+		
 		float playerCenterX = player.x + player.width/2;
 		float playerCenterY = player.y + player.height/2;
 		float enemyCenterX = hitbox.x + hitbox.width/2;
@@ -115,6 +119,7 @@ public abstract class Enemy extends Entity{
 	}
 
 	public void updatePos(float xSpeed, float ySpeed, int mode) {
+		
 		moving = false;
 		
 		// horizontal movement

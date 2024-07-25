@@ -31,13 +31,13 @@ import static utilz.Constants.Directions.*;
 public class Player extends Entity{
 	
 	// hitbox vars
-	private float xDrawOffset = 8.5f * Game.SCALE;
-	private float yDrawOffset = 5 * Game.SCALE;
-	private float hitboxWidth = 15 * Game.SCALE;
-	private float hitboxHeight = 27 * Game.SCALE;
+	private float xDrawOffset = 16 * Game.SCALE;
+	private float yDrawOffset = 16 * Game.SCALE;
+	private float hitboxWidth = 32 * Game.SCALE;
+	private float hitboxHeight = 32 * Game.SCALE;
 	private float xCollisionBoxOffset = 0 * Game.SCALE;
-	private float yCollisionBoxOffset = 22 * Game.SCALE;
-	private float collisionBoxWidth = 15 * Game.SCALE;
+	private float yCollisionBoxOffset = 27 * Game.SCALE;
+	private float collisionBoxWidth = hitboxWidth;
 	private float collisionBoxHeight = 5 * Game.SCALE;
 	
 	// movement/direction vars
@@ -46,6 +46,8 @@ public class Player extends Entity{
 	private int movingDirection;
 	private int xLocationOffset, yLocationOffset;
 	private boolean facingForward = true;
+//	public int lookingUp = 2, lookingDown = 1, lookingForward = 0;
+//	private int lookingDir = lookingForward;
 	
 	// status
 	private boolean usingSpell = false;
@@ -88,7 +90,7 @@ public class Player extends Entity{
 	}
 	
 	public void init() {
-		animations = ImageHelpMethods.GetDefaultSizeSprites("player/redHoodCustom.png", 8, 13);
+		animations = ImageHelpMethods.GetSpecificSizeSprites("player/test.png", 11, 9, 64, 64);
 		mirroredAnimations = ImageHelpMethods.GetMirroredSprites(animations);
 		
 		initHitbox(x, y, hitboxWidth, hitboxHeight);
@@ -201,17 +203,35 @@ public class Player extends Entity{
 	private void setAnimation() {
 		int startAni = action;
 		
-		if(moving)
-			action = facingForward ? WALKING : WALKING_B;
-		else
-			action = facingForward ? IDLE : IDLE_B;;
+		
+		if(moving) {
+			//action = facingForward ? WALKING : WALKING_DOWN;
+			if(ySpeed > 0)
+				action = WALKING_DOWN;
+			else if(ySpeed < 0)
+				action = WALKING_UP;
+			else
+				action =  facingForward ? WALKING : WALKING_UP;
+		}else
+			action = facingForward ? IDLE : IDLE_B;
+		
 		
 		if(castingSpellAnimation)
-			action = facingForward ? CASTING_SPELL : CASTING_SPELL_B;;
+			action = CASTING_SPELL;
+			//action = facingForward ? CASTING_SPELL : CASTING_SPELL_B;;
 		
 		// need to update this
-		if(attacking)
-			action = facingForward ? CASTING_SPELL : CASTING_SPELL_B;
+		if(attacking) {
+			if(lookingUp)
+				action = ATTACKING_UP;
+			else if(lookingDown)
+				action = ATTACKING_DOWN;
+			else {
+				action = ATTACKING;
+				facingForward = true;
+			}
+		}
+		//action = facingForward ? CASTING_SPELL : CASTING_SPELL_B;
 		
 		if(startAni !=  action)
 			resetAniTick();
@@ -222,6 +242,7 @@ public class Player extends Entity{
 		aniIndex = 0;
 	}
 
+	float xSpeed = 0, ySpeed = 0;
 	private void updatePos() {
 		moving = false;
 		
@@ -231,7 +252,8 @@ public class Player extends Entity{
 		if(!left && !right && !up && !down)
 			return;
 		
-		float xSpeed = 0, ySpeed = 0;
+		xSpeed = 0;
+		ySpeed = 0;
 		
 		if (left && !right)
 			xSpeed = -playerSpeed;
@@ -285,20 +307,21 @@ public class Player extends Entity{
 	}
 	
 	private void updateMovingDirection(float xSpeed, float ySpeed) {
+		
 		if(ySpeed < 0) {
 			if(xSpeed > 0)
 				movingDirection = UP_RIGHT;
 			else if(xSpeed < 0)
 				movingDirection = UP_LEFT;
 			else
-				movingDirection = UP;
+				movingDirection = facingRight ? UP_RIGHT : UP_LEFT;
 		}else if(ySpeed > 0) {
 			if(xSpeed > 0)
 				movingDirection = DOWN_RIGHT;
 			else if(xSpeed < 0)
 				movingDirection = DOWN_LEFT;
 			else
-				movingDirection = DOWN;
+				movingDirection = facingRight ? DOWN_RIGHT : DOWN_LEFT;
 		}else {
 			if(xSpeed > 0)
 				movingDirection = RIGHT;
@@ -306,7 +329,19 @@ public class Player extends Entity{
 				movingDirection = LEFT;
 		}
 		
+		
+		lookingDown = false;
+		lookingUp = false;
+		if(ySpeed > 0) {
+			lookingDown = true;
+			lookingUp = false;
+		}else if(ySpeed < 0) {
+			lookingDown = false;
+			lookingUp = true;
+		}
+		
 	}
+	boolean lookingDown = false, lookingUp = false;
 
 	public void resetDirBooleans() {
 		left = false;

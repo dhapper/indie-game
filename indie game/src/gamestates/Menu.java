@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 import main.Game;
+import utilz.LoadSave;
 
 public class Menu extends State implements Statemethods{
 	
@@ -22,6 +23,8 @@ public class Menu extends State implements Statemethods{
 	public void draw(Graphics g) {
 		g.drawRect(100, 100, 100, 100);
 		g.drawString("Menu, press enter", 300, 300);
+		
+		g.drawImage(LoadSave.LoadImage("player/test.png").getSubimage(0, 32, 32, 32), 300, 300, Game.TILES_SIZE, Game.TILES_SIZE, null);
 	}
 
 	@Override

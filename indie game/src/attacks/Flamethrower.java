@@ -63,6 +63,8 @@ public class Flamethrower extends Spell implements SpellMethods{
 		numOfFrames[GROWTH] = 5;
 		numOfFrames[MATURE] = 5;
 		numOfFrames[ENDING] = 5;
+		
+		damage = 3;
 	}
 	
 	public void spellEffect() {
@@ -75,7 +77,7 @@ public class Flamethrower extends Spell implements SpellMethods{
 			
 			if(player.getFlamethrower().getBounds().intersects(offsetHitbox)) {
 				if(!enemy.isAffectedDuringSpell()) {
-					enemy.damageEnemy(1);
+					enemy.damageEnemy(damage);
 					enemy.setAffectedDuringSpell(true);
 				}
 			}

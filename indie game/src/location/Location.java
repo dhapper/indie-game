@@ -14,6 +14,7 @@ public class Location {
     private ArrayList<int[][]> mapData;
     private ArrayList<ExitZone> exitZones;
     private Animation[][] animations;
+    private int shader = 0;
 
     public Location(LocationManager locationManager, int index, ArrayList<int[][]> mapData) {
         this.locationManager = locationManager;
@@ -23,9 +24,17 @@ public class Location {
 
         initAnimations();
         loadExitZones();
+        
+        initShaders();
     }
 
-    private void initAnimations() {
+    private void initShaders() {
+		if(index == 1)
+			this.shader = 1;
+		
+	}
+
+	private void initAnimations() {
         for (int y = 0; y < mapData.get(0).length; y++) {
             for (int x = 0; x < mapData.get(0)[0].length; x++) {
                 int index = getSpriteIndex(EditorConstants.MapEditorConstants.ANIMATED_SPRITES, x, y);	// dont like this
@@ -45,19 +54,27 @@ public class Location {
             }
         }
     }
+    
+    // maybe shouldnt be here
 
     public void draw(Graphics g, int xOffset, int yOffset) {
         for (int layer : EditorConstants.MapEditorConstants.LAYER_ORDER) {
-            for (int y = 0; y < mapData.get(0).length; y++) {
-                for (int x = 0; x < mapData.get(0)[0].length; x++) {
-                    int index = getSpriteIndex(layer, x, y);
-                    if (layer == EditorConstants.MapEditorConstants.ANIMATED_SPRITES && index != -1 && animations[y][x].isAnimating()) {
-                        g.drawImage(animations[y][x].getCurrentFrame(), x * Game.TILES_SIZE - xOffset, y * Game.TILES_SIZE - yOffset, Game.TILES_SIZE, Game.TILES_SIZE, null);
-                    } else if (index != -1) {
-                        g.drawImage(locationManager.getSprite(layer, index), x * Game.TILES_SIZE - xOffset, y * Game.TILES_SIZE - yOffset, Game.TILES_SIZE, Game.TILES_SIZE, null);
-                    }
-                }
-            }
+        	
+        	if(layer != EditorConstants.MapEditorConstants.ENEMY_SPRITES) {
+        		
+        	
+	            for (int y = 0; y < mapData.get(0).length; y++) {
+	                for (int x = 0; x < mapData.get(0)[0].length; x++) {
+	                    int index = getSpriteIndex(layer, x, y);
+	                    if (layer == EditorConstants.MapEditorConstants.ANIMATED_SPRITES && index != -1 && animations[y][x].isAnimating()) {
+	                        g.drawImage(animations[y][x].getCurrentFrame(), x * Game.TILES_SIZE - xOffset, y * Game.TILES_SIZE - yOffset, Game.TILES_SIZE, Game.TILES_SIZE, null);
+	                    } else if (index != -1) {
+	                        g.drawImage(locationManager.getSprite(layer, index), x * Game.TILES_SIZE - xOffset, y * Game.TILES_SIZE - yOffset, Game.TILES_SIZE, Game.TILES_SIZE, null);
+	                    }
+	                }
+	            }
+            
+        	}
         }
 
         for (ExitZone ez : exitZones) {
@@ -65,7 +82,15 @@ public class Location {
         }
     }
 
-    public int getSpriteIndex(int layer, int x, int y) {
+	public int getShader() {
+		return shader;
+	}
+
+	public void setShader(int shader) {
+		this.shader = shader;
+	}
+
+	public int getSpriteIndex(int layer, int x, int y) {
         return mapData.get(layer)[y][x];
     }
 

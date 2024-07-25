@@ -42,7 +42,7 @@ public class Book extends Entity{
 	}
 
 	public void updateDrawOffsets() {
-		xDrawOffset = player.isFacingRight() ? -12 * Game.SCALE : 12 * Game.SCALE;
+		xDrawOffset = player.isFacingRight() ? -12 * Game.SCALE : 28 * Game.SCALE;
 		yDrawOffset = player.isFacingForward() ? 6 * Game.SCALE :  -6 * Game.SCALE;
 	}
 	

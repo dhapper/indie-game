@@ -95,7 +95,7 @@ public class Attack {
 
 	    switch (direction) {
 	        case UP:
-	            drawAttack(g, 0, -yShift, 0);
+	           drawAttack(g, 0, -yShift, 0);
 	            break;
 	        case DOWN:
 	            drawAttack(g, 0, yShift, 180);
@@ -148,25 +148,25 @@ public class Attack {
 		if(currentFrame == null)
 			currentFrame = sprites[aniIndex][index];
 		currentFrame = GraphicsHelp.RotateImage(currentFrame, rotation);
-		g.drawImage(currentFrame, (int) (xPos + 16 * Game.SCALE), (int) (yPos + 16 * Game.SCALE), Game.TILES_SIZE, Game.TILES_SIZE, null);
+		//g.drawImage(currentFrame, (int) (xPos + 16 * Game.SCALE), (int) (yPos + 16 * Game.SCALE), Game.TILES_SIZE, Game.TILES_SIZE, null);
 	}
 	
 	private void drawHitbox(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setColor(Color.RED);
-		g2d.draw(hitbox);
+		g2d.fill(hitbox);
 	}
 	
 	// for managing seperate attacks, use switch
 	public void initAttackSpecificVars() {
-		defaultDrawWidth = 16;
+		defaultDrawWidth = 32;
 		defaultDrawHeight = 16;
 		defaultDrawX = 32 - defaultDrawWidth/2;
-		defaultDrawY = 32 - defaultDrawHeight;
+		defaultDrawY = 38 - defaultDrawHeight;
 		
-		defaultDrawDiagonalWidth = 16;
-		defaultDrawDiagonalHeight = 16;
-		defaultDrawDiagonalX = 32 - defaultDrawDiagonalWidth;
+		defaultDrawDiagonalWidth = 32;
+		defaultDrawDiagonalHeight = 12;
+		defaultDrawDiagonalX = 44 - defaultDrawDiagonalWidth;
 		defaultDrawDiagonalY = defaultDrawDiagonalHeight;
 		
 		damage = 1;
@@ -278,7 +278,7 @@ public class Attack {
 					enemy.damageEnemy(damage);
 					enemy.setAffectedDuringAttack(true);
 				}
-				AttackHelpMethods.KnockBack(enemy, 3F, player.getHitbox(), enemy.getHitbox());
+				AttackHelpMethods.KnockBack(enemy, 3, player.getHitbox(), enemy.getHitbox());
 			}
 		}
 	}
@@ -292,7 +292,7 @@ public class Attack {
 	}
 	
 	public int[] getSpriteDurations() {
-		int durPerFrame = 20;
+		int durPerFrame = 29;
 		return new int[] {durPerFrame, durPerFrame, durPerFrame};
 	}
 	
