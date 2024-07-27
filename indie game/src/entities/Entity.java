@@ -1,4 +1,4 @@
-package entities.enemy;
+package entities;
 
 import java.awt.Color;
 
@@ -7,7 +7,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import entities.Enemy;
+import entities.enemy.Enemy;
 import graphics.GraphicsHelp;
 import utilz.LoadSave;
 
@@ -73,31 +73,31 @@ public abstract class Entity {
 //		}
 //	}
 	
-	protected void loadAnimations16(String filePath, int spritesWide, int spritesLong) {
-		spriteSheet = LoadSave.LoadImage(filePath);
-		animations = new BufferedImage[spritesLong][spritesWide];
-		mirroredAnimations = new BufferedImage[spritesLong][spritesWide];
-		
-		for(int j = 0; j < animations.length; j++) {
-			for(int i = 0; i < animations[j].length; i++) {
-				animations[j][i] = spriteSheet.getSubimage(i*16, j*16, 16, 16);
-				mirroredAnimations[j][i] = GraphicsHelp.MirrorImage(animations[j][i]);
-			}
-		}
-	}
-	
-	protected void loadAnimations32(String filePath, int spritesWide, int spritesLong) {
-		spriteSheet = LoadSave.LoadImage(filePath);
-		animations = new BufferedImage[spritesLong][spritesWide];
-		mirroredAnimations = new BufferedImage[spritesLong][spritesWide];
-		
-		for(int j = 0; j < animations.length; j++) {
-			for(int i = 0; i < animations[j].length; i++) {
-				animations[j][i] = spriteSheet.getSubimage(i*32, j*32, 32, 32);
-				mirroredAnimations[j][i] = GraphicsHelp.MirrorImage(animations[j][i]);
-			}
-		}
-	}
+//	protected void loadAnimations16(String filePath, int spritesWide, int spritesLong) {
+//		spriteSheet = LoadSave.LoadImage(filePath);
+//		animations = new BufferedImage[spritesLong][spritesWide];
+//		mirroredAnimations = new BufferedImage[spritesLong][spritesWide];
+//		
+//		for(int j = 0; j < animations.length; j++) {
+//			for(int i = 0; i < animations[j].length; i++) {
+//				animations[j][i] = spriteSheet.getSubimage(i*16, j*16, 16, 16);
+//				mirroredAnimations[j][i] = GraphicsHelp.MirrorImage(animations[j][i]);
+//			}
+//		}
+//	}
+//	
+//	protected void loadAnimations32(String filePath, int spritesWide, int spritesLong) {
+//		spriteSheet = LoadSave.LoadImage(filePath);
+//		animations = new BufferedImage[spritesLong][spritesWide];
+//		mirroredAnimations = new BufferedImage[spritesLong][spritesWide];
+//		
+//		for(int j = 0; j < animations.length; j++) {
+//			for(int i = 0; i < animations[j].length; i++) {
+//				animations[j][i] = spriteSheet.getSubimage(i*32, j*32, 32, 32);
+//				mirroredAnimations[j][i] = GraphicsHelp.MirrorImage(animations[j][i]);
+//			}
+//		}
+//	}
 	
 	public void loadMapData(ArrayList<int[][]> mapData, ArrayList<Entity> characterData, ArrayList<Enemy> enemyData) {
 		this.mapData = mapData;
@@ -137,5 +137,6 @@ public abstract class Entity {
 	public boolean isFacingRight() {
 		return facingRight;
 	}
+	
 	
 }

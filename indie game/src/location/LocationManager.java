@@ -4,7 +4,9 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import entities.Enemy;
+import entities.Entity;
+import entities.Tree;
+import entities.enemy.Enemy;
 import entities.enemy.Ghost;
 import entities.enemy.Slime;
 import main.Game;
@@ -58,12 +60,9 @@ public class LocationManager {
     }
     
 	public ArrayList<Enemy> loadEnemies(ArrayList<Enemy> enemies) {
-		
 		enemies = new ArrayList<Enemy>();
-		
 		for (int y = 0; y < currentLocation.getMapData().get(0).length; y++) {
             for (int x = 0; x < currentLocation.getMapData().get(0)[0].length; x++) {
-            	
             	switch(currentLocation.getMapData().get(EditorConstants.MapEditorConstants.ENEMY_SPRITES)[y][x]) {
             	case Constants.EnemyIndex.SLIME:
             		enemies.add(new Slime(x * Game.TILES_SIZE, y * Game.TILES_SIZE, Game.TILES_SIZE, Game.TILES_SIZE));
@@ -72,15 +71,28 @@ public class LocationManager {
             		enemies.add(new Ghost(x * Game.TILES_SIZE, y * Game.TILES_SIZE, Game.TILES_SIZE, Game.TILES_SIZE));
             		break;
             	}
-            	
-            	
             }
 		}
-		
 		return enemies;
-		
 	}
-
+	
+	public ArrayList<Entity> loadObjects(ArrayList<Entity> objects) {
+		objects = new ArrayList<Entity>();
+		for (int y = 0; y < currentLocation.getMapData().get(0).length; y++) {
+            for (int x = 0; x < currentLocation.getMapData().get(0)[0].length; x++) {
+            	switch(currentLocation.getMapData().get(EditorConstants.MapEditorConstants.OBJECT_SPRITES)[y][x]) {
+            	case Constants.ObjectIndex.PINK_TREE:
+            		objects.add(new Tree(0, x * Game.TILES_SIZE, y * Game.TILES_SIZE, Game.TILES_SIZE * 2, Game.TILES_SIZE * 2));
+            		break;
+            	case Constants.ObjectIndex.GREEN_TREE:
+            		objects.add(new Tree(1, x * Game.TILES_SIZE, y * Game.TILES_SIZE, Game.TILES_SIZE * 2, Game.TILES_SIZE * 2));
+            		break;
+            	}
+            }
+		}
+		return objects;
+	}
+	
     public BufferedImage getSprite(int layer, int index) {
         return sprites.get(layer)[index];
     }

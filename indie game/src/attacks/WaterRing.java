@@ -5,11 +5,12 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 
-import entities.Enemy;
+import entities.enemy.Enemy;
 import entities.player.Player;
 import gamestates.Overworld;
 import main.Game;
-import utilz.ImageHelpMethods;
+import utilz.LoadSave;
+import utilz.SpriteHelpMethods;
 
 public class WaterRing extends Spell implements SpellMethods{
 	
@@ -23,7 +24,7 @@ public class WaterRing extends Spell implements SpellMethods{
 	}
 	
 	public void init() {
-		sprites = ImageHelpMethods.GetSpecificSizeSprites("spells/WATER_RING.png", 3, 1, 64, 64);
+		sprites = SpriteHelpMethods.GetSpecificSizeSprites(LoadSave.LoadImage("spells/WATER_RING.png"), 3, 1, 64, 64);
 		bounds = new Ellipse2D.Float();
 	}
 	

@@ -2,6 +2,12 @@ package utilz;
 
 public class Constants {
 
+	public static class ObjectIndex{
+		
+		public static final int PINK_TREE = 0;
+		public static final int GREEN_TREE = 8;
+	}
+	
 	public static class EnemyIndex{
 		public static final int SLIME = 0;
 		public static final int GHOST = 1;
@@ -92,9 +98,9 @@ public class Constants {
 			}
 		}
 		
-		static int atk = 8;
-		static int walk = 20;
-		static int cast = 10; 
+		public static final int ATTACK_FRAME_TIME = 7;
+		public static final int walk = 20;
+		public static final int cast = 10; 
 		
 		public static int[] GetSpriteDuration(int player_action) {
 			switch(player_action) {
@@ -108,8 +114,10 @@ public class Constants {
 			case ATTACKING:
 			case ATTACKING_DOWN:
 			case ATTACKING_UP:
-				//return new int[] {atk, atk, atk, atk, atk, atk, atk};
-				return new int[] {atk, atk, atk, atk, atk, atk, atk, atk, atk, atk, atk};
+				int[] durations = new int[GetSpriteAmount(player_action)];
+				for(int i = 0; i < durations.length; i++)
+				    durations[i] = ATTACK_FRAME_TIME;
+				return durations;
 			case CASTING_SPELL:
 				return new int[] {120};
 			default:

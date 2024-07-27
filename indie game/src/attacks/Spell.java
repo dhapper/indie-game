@@ -3,8 +3,8 @@ package attacks;
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
 
-import entities.Enemy;
-import entities.enemy.Entity;
+import entities.Entity;
+import entities.enemy.Enemy;
 import entities.player.Player;
 
 public abstract class Spell {

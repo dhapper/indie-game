@@ -5,26 +5,41 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 import main.Game;
+import ui.MenuButton;
 import utilz.LoadSave;
 
 public class Menu extends State implements Statemethods{
 	
+	private MenuButton[] buttons = new MenuButton[2];
+	
 	public Menu(Game game) {
 		super(game);
+		
+		buttons[0] = new MenuButton(Game.GAME_WIDTH/2, Game.GAME_HEIGHT/3, 0, GameState.OVERWORLD);	// to generate values, maybe make into constants
+		
+		
+		buttons[0] = new MenuButton(Game.GAME_WIDTH/2 - buttons[0].getWidth()/2, Game.GAME_HEIGHT*2/5 - buttons[0].getHeight()/2, 0, GameState.OVERWORLD);
+		buttons[1] = new MenuButton(Game.GAME_WIDTH/2 - buttons[0].getWidth()/2, Game.GAME_HEIGHT*3/5 - buttons[0].getHeight()/2, 1, GameState.OVERWORLD);
 	}
 
 
 	@Override
 	public void update() {
-		
+		for (MenuButton mb : buttons)
+			mb.update();
 	}
 
 	@Override
 	public void draw(Graphics g) {
-		g.drawRect(100, 100, 100, 100);
-		g.drawString("Menu, press enter", 300, 300);
 		
-		g.drawImage(LoadSave.LoadImage("player/test.png").getSubimage(0, 32, 32, 32), 300, 300, Game.TILES_SIZE, Game.TILES_SIZE, null);
+		g.drawImage(LoadSave.LoadImage("menu bg.png"), 0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
+		
+		int width = 500;
+		int height = 250;
+		g.drawImage(LoadSave.LoadImage("title.png"), Game.GAME_WIDTH/2 - width/2, Game.GAME_HEIGHT/5 - height/2, width, height, null);
+		
+		for (MenuButton mb : buttons)
+			mb.draw(g);
 	}
 
 	@Override
@@ -35,17 +50,42 @@ public class Menu extends State implements Statemethods{
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		
+		for (MenuButton mb : buttons) {
+			if(isIn(e, mb)) {	
+				mb.setMousePressed(true);
+				break;
+			}
+		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		
+		for (MenuButton mb : buttons) {
+			if(isIn(e, mb)) {
+				if(mb.isMousePressed())
+					mb.applyGameState();
+				break;
+			}
+		}
+		resetButtons();
 	}
 
+	private void resetButtons() {
+		for(MenuButton mb : buttons)
+			mb.resetBools();
+		
+	}
+	
 	@Override
 	public void mouseMoved(MouseEvent e) {
+		for(MenuButton mb : buttons)
+			mb.setMouseOver(false);
 		
+		for(MenuButton mb : buttons)
+			if(isIn(e, mb)) {
+				mb.setMouseOver(true);
+			break;
+			}
 	}
 
 	@Override

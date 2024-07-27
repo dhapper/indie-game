@@ -2,11 +2,12 @@ package entities.player;
 
 import java.awt.Graphics;
 
-import entities.enemy.Entity;
+import entities.Entity;
 import graphics.GraphicsHelp;
 import main.Game;
 import utilz.HelpMethods;
-import utilz.ImageHelpMethods;
+import utilz.LoadSave;
+import utilz.SpriteHelpMethods;
 
 public class Book extends Entity{
 
@@ -24,7 +25,7 @@ public class Book extends Entity{
 		super(x, y, width, height);
 		this.player = player;
 		
-		animations = ImageHelpMethods.GetSpecificSizeSprites("player/book.png", 2, 2, 16, 16);
+		animations = SpriteHelpMethods.GetSpecificSizeSprites(LoadSave.LoadImage("player/book.png"), 2, 2, 16, 16);
 	}
 
 	public void update() {

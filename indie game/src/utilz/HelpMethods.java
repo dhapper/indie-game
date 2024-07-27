@@ -5,8 +5,9 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Float;
 import java.util.ArrayList;
 
-import entities.Enemy;
-import entities.enemy.Entity;
+import entities.Entity;
+import entities.Tree;
+import entities.enemy.Enemy;
 import entities.player.Player;
 import main.Game;
 
@@ -27,10 +28,19 @@ public class HelpMethods {
 		Rectangle2D.Float nextHitbox = new Rectangle2D.Float(entity.getHitbox().x + xSpeed, entity.getHitbox().y + ySpeed,
 				entity.getHitbox().width, entity.getHitbox().height);
 		
+		Rectangle2D.Float nextCollisionBox = new Rectangle2D.Float(entity.getCollisionBox().x + xSpeed, entity.getCollisionBox().y + ySpeed,
+				entity.getCollisionBox().width, entity.getCollisionBox().height);
+		
 		for(Entity e : entityList)
-			if(e != entity)
-				if(e.getHitbox().intersects(nextHitbox) && e.isAlive())
+			if(e != entity) {
+				
+				if(e instanceof Tree) {
+					if(e.getHitbox().intersects(nextCollisionBox))
 						return true;
+				}else if(e.getHitbox().intersects(nextHitbox) && e.isAlive())
+					return true;
+				
+			}
 		return false;
 	}
 
@@ -63,8 +73,9 @@ public class HelpMethods {
 		
 			if(value != -1) {
 				// check if overlap layer is above animated layer (water)
-				if(!(layer == ANIMATED_SPRITES && mapData.get(OVERLAP_SPRITES)[(int) yIndex][(int) xIndex] != -1))
+				if(!(layer == ANIMATED_SPRITES && ((mapData.get(OVERLAP_SPRITES)[(int) yIndex][(int) xIndex] != -1) || mapData.get(PATH_SPRITES)[(int) yIndex][(int) xIndex] != -1)))
 					return true;
+				
 			}
 		}
 		

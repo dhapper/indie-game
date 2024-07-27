@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import main.Game;
-import utilz.ImageHelpMethods;
+import utilz.SpriteHelpMethods;
 import utilz.LoadSave;
 
 public class HUD {
@@ -28,8 +28,8 @@ public class HUD {
 	public HUD(Player player) {
 		this.player = player;
 		
-		manaStars = ImageHelpMethods.GetDefaultSizeSprites("player/mana stars.png", 29, 2);
-		playerHearts = ImageHelpMethods.GetDefaultSizeSprites("player/player hearts.png", 4, 1);
+		manaStars = SpriteHelpMethods.GetDefaultSizeSprites(LoadSave.LoadImage("player/mana stars.png"), 29, 2);
+		playerHearts = SpriteHelpMethods.GetDefaultSizeSprites(LoadSave.LoadImage("player/player hearts.png"), 4, 1);
 		
 		updateHearts();
 	}

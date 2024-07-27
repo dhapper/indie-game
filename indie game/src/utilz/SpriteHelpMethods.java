@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import graphics.GraphicsHelp;
 import main.Game;
 
-public class ImageHelpMethods {
+public class SpriteHelpMethods {
 
 	public static BufferedImage[][] GetMirroredSprites(BufferedImage[][] sprites) {
 	    int spritesWide = sprites.length;
@@ -18,13 +18,12 @@ public class ImageHelpMethods {
 	}
 
 	
-	public static BufferedImage[][] GetDefaultSizeSprites(String filePath, int spritesWide, int spritesLong){
-		return GetSpecificSizeSprites(filePath, spritesWide, spritesLong, Game.TILES_DEFAULT_SIZE, Game.TILES_DEFAULT_SIZE);
+	public static BufferedImage[][] GetDefaultSizeSprites(BufferedImage sheet, int spritesWide, int spritesLong){
+		return GetSpecificSizeSprites(sheet, spritesWide, spritesLong, Game.TILES_DEFAULT_SIZE, Game.TILES_DEFAULT_SIZE);
 	}
 	
-	public static BufferedImage[][] GetSpecificSizeSprites(String filePath, int spritesWide, int spritesLong, int width, int height) {
+	public static BufferedImage[][] GetSpecificSizeSprites(BufferedImage sheet, int spritesWide, int spritesLong, int width, int height) {
 	    BufferedImage[][] sprites = new BufferedImage[spritesWide][spritesLong];
-	    BufferedImage sheet = LoadSave.LoadImage(filePath);
 	    for(int i = 0; i < spritesWide; i++)
 	        for(int j = 0; j < spritesLong; j++)
 	            sprites[i][j] = sheet.getSubimage(i * width, j * height, width, height);

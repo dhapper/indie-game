@@ -1,10 +1,10 @@
-package entities;
+package entities.enemy;
 
 import java.awt.Color; 
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 
-import entities.enemy.Entity;
+import entities.Entity;
 import entities.player.Player;
 import main.Game;
 import utilz.HelpMethods;

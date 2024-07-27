@@ -1,12 +1,15 @@
 package location;
 
 import java.awt.Graphics;
+
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import graphics.Animation;
 import main.Game;
 import mapeditor.EditorConstants;
 import utilz.Constants;
+
+import static mapeditor.EditorConstants.MapEditorConstants.*;
 
 public class Location {
     private LocationManager locationManager;
@@ -37,7 +40,7 @@ public class Location {
 	private void initAnimations() {
         for (int y = 0; y < mapData.get(0).length; y++) {
             for (int x = 0; x < mapData.get(0)[0].length; x++) {
-                int index = getSpriteIndex(EditorConstants.MapEditorConstants.ANIMATED_SPRITES, x, y);	// dont like this
+                int index = getSpriteIndex(ANIMATED_SPRITES, x, y);	// dont like this
                 if (index != -1) {
                     animations[y][x] = new Animation("ANIMATED_SPRITES.png", 0, 9, 20); // Adjust params as needed
                 }
@@ -58,9 +61,9 @@ public class Location {
     // maybe shouldnt be here
 
     public void draw(Graphics g, int xOffset, int yOffset) {
-        for (int layer : EditorConstants.MapEditorConstants.LAYER_ORDER) {
+        for (int layer : LAYER_ORDER) {
         	
-        	if(layer != EditorConstants.MapEditorConstants.ENEMY_SPRITES) {
+        	if(layer != ENEMY_SPRITES && layer != OBJECT_SPRITES) {
         		
         	
 	            for (int y = 0; y < mapData.get(0).length; y++) {
@@ -111,12 +114,12 @@ public class Location {
         Rectangle exitZoneRect;
         switch (index) {
             case 0:
-            	exitZoneRect = new Rectangle(39 * Game.TILES_SIZE, 24 * Game.TILES_SIZE, Game.TILES_SIZE, Game.TILES_SIZE);
+            	exitZoneRect = new Rectangle(40 * Game.TILES_SIZE, 38 * Game.TILES_SIZE, Game.TILES_SIZE, Game.TILES_SIZE);
                 exitZones.add(new ExitZone(exitZoneRect, 1, 2 * Game.TILES_SIZE, 4 * Game.TILES_SIZE));
                 break;
             case 1:
-            	exitZoneRect = new Rectangle(1 * Game.TILES_SIZE, 6 * Game.TILES_SIZE, Game.TILES_SIZE, Game.TILES_SIZE);
-                exitZones.add(new ExitZone(exitZoneRect, 0, 2 * Game.TILES_SIZE, 4 * Game.TILES_SIZE));
+            	exitZoneRect = new Rectangle(2 * Game.TILES_SIZE, 11 * Game.TILES_SIZE, Game.TILES_SIZE, Game.TILES_SIZE);
+                exitZones.add(new ExitZone(exitZoneRect, 0, 39 * Game.TILES_SIZE, 38 * Game.TILES_SIZE));
                 break;
         }
     }

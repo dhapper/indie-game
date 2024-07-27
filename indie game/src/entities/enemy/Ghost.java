@@ -4,11 +4,11 @@ import java.awt.Graphics;
 
 import java.awt.image.BufferedImage;
 
-import entities.Enemy;
 import gamestates.Overworld;
 import main.Game;
 import utilz.HelpMethods;
-import utilz.ImageHelpMethods;
+import utilz.LoadSave;
+import utilz.SpriteHelpMethods;
 
 import static utilz.Constants.Directions.*;
 
@@ -37,8 +37,8 @@ public class Ghost extends Enemy{
 	}
 	
 	private void init() {
-		animations = ImageHelpMethods.GetDefaultSizeSprites("npc/enemy/ghost.png", 6, 1);
-		mirroredAnimations = ImageHelpMethods.GetMirroredSprites(animations);
+		animations = SpriteHelpMethods.GetDefaultSizeSprites(LoadSave.LoadImage("npc/enemy/ghost.png"), 6, 1);
+		mirroredAnimations = SpriteHelpMethods.GetMirroredSprites(animations);
 		
 		initHitbox(x, y, hitboxWidth, hitboxHeight);
 		initCollisionBox(x + xCollisionBoxOffset, y + yCollisionBoxOffset, collisionBoxWidth, collisionBoxHeight);

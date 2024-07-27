@@ -1,13 +1,17 @@
 package gamestates;
 
 import java.awt.Graphics;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 
-import entities.Enemy;
-import entities.enemy.Entity;
+import entities.Entity;
+import entities.Tree;
+import entities.enemy.Enemy;
 import entities.enemy.Ghost;
 import entities.enemy.Slime;
 import entities.player.Player;
@@ -39,6 +43,7 @@ public class Overworld extends State implements Statemethods{
 	// entity lists
 	private ArrayList<Entity> characters;
 	private ArrayList<Enemy> enemies;
+	private ArrayList<Entity> objects;
 	
 	public Overworld(Game game) {
 		super(game);
@@ -49,25 +54,47 @@ public class Overworld extends State implements Statemethods{
 	private void init() {
 		locationManager = new LocationManager(game);
 		player = new Player( 2 * Game.TILES_SIZE, 2 * Game.TILES_SIZE, Game.TILES_SIZE * 2, Game.TILES_SIZE * 2);
+		
 		loadLocation(0);	// first map loaded
 	}
-
+	
+	public static ArrayList<Entity> sortEntitiesByY(ArrayList<Entity> entities) {
+        ArrayList<Entity> sortedList = new ArrayList<>(entities);
+        Collections.sort(sortedList, new Comparator<Entity>() {
+            @Override
+            public int compare(Entity e1, Entity e2) {
+                return Float.compare(e1.getHitbox().y + e1.getHitbox().height, e2.getHitbox().y + e2.getHitbox().height);
+            }
+        });
+        return sortedList;
+	}
+	
 	@Override
 	public void draw(Graphics g) {
         locationManager.draw(g, xLocationOffset, yLocationOffset);;
-		player.render(g, xLocationOffset, yLocationOffset);
+	
 		
-		for(Enemy enemy : enemies)
-			enemy.render(g, xLocationOffset, yLocationOffset);
-		
-		
-		//Shaders.draw(g, player.getHitbox().x - xLocationOffset, player.getHitbox().y  - yLocationOffset);
-		
-		if(locationManager.getCurrentLocation().getShader() ==  1) {
-			Shaders.caveShaders(g, (float) (player.getHitbox().getCenterX() - xLocationOffset), (float) (player.getHitbox().getCenterY() - yLocationOffset), 100, 100);
+		ArrayList<Entity> orderedEntityList = sortEntitiesByY(characters);
+		for(Entity e : orderedEntityList) {
+			
+			if(!e.isAlive())
+				continue;
+			
+			if(e instanceof Player)
+				player.render(g, xLocationOffset, yLocationOffset);
+			
+			if(e instanceof Enemy)
+				((Enemy) e).render(g, xLocationOffset, yLocationOffset);
+			
+			if(e instanceof Tree)
+				((Tree) e).draw(g, xLocationOffset, yLocationOffset);
 		}
 		
+		if(locationManager.getCurrentLocation().getShader() ==  1)
+			Shaders.caveShaders(g, (float) (player.getHitbox().getCenterX() - xLocationOffset), (float) (player.getHitbox().getCenterY() - yLocationOffset), 100, 100);
+		
 		player.getHud().draw(g);
+		
 	}
 	
 	@Override
@@ -93,6 +120,7 @@ public class Overworld extends State implements Statemethods{
 			enemy.update();
 		
 		player.getBook().updatePlayerPos((int) (player.getHitbox().x - xLocationOffset), (int) (player.getHitbox().y - yLocationOffset));
+		
 	}
 	
 	private void updateEnemyList() {
@@ -127,12 +155,14 @@ public class Overworld extends State implements Statemethods{
 		// set location in manager
 		locationManager.setCurrentLocation(locationIndex);
 		
-		// load enemies
+		// load entities
 		initLocationCharacters();
 		
 		enemies = locationManager.loadEnemies(enemies);
+		objects = locationManager.loadObjects(objects);
 		
 		characters.addAll(enemies);
+		characters.addAll(objects);
 		
 		for(Enemy enemy : enemies) {
 			enemy.loadPlayerHitbox(player.getHitbox());

@@ -5,11 +5,10 @@ import static utilz.Constants.SlimeConstants.*;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import entities.Enemy;
 import gamestates.Overworld;
 import main.Game;
 import utilz.HelpMethods;
-import utilz.ImageHelpMethods;
+import utilz.SpriteHelpMethods;
 import utilz.LoadSave;
 
 import static utilz.Constants.Directions.*;
@@ -33,8 +32,8 @@ public class Slime extends Enemy{
 	}
 	
 	private void init() {
-		animations = ImageHelpMethods.GetDefaultSizeSprites("npc/enemy/slime.png", 6, 3);
-		mirroredAnimations = ImageHelpMethods.GetMirroredSprites(animations);
+		animations = SpriteHelpMethods.GetDefaultSizeSprites(LoadSave.LoadImage("npc/enemy/slime.png"), 6, 3);
+		mirroredAnimations = SpriteHelpMethods.GetMirroredSprites(animations);
 		
 		initHitbox(x, y, hitboxWidth, hitboxHeight);
 		initCollisionBox(x + xCollisionBoxOffset, y + yCollisionBoxOffset, collisionBoxWidth, collisionBoxHeight);

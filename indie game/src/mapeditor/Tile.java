@@ -28,9 +28,10 @@ public class Tile {
 		
 		int rowIndex = index - index%(MapEditor.SPRITE_LAYERS.get(MapEditor.LAYER).getWidth());
 		
-		if(MapEditor.LAYER == ANIMATED_SPRITES)
+		if(MapEditor.LAYER == ANIMATED_SPRITES) {
 			this.sprite = GraphicsHelp.DecreaseAlpha(MapEditor.SPRITE_LAYERS.get(MapEditor.LAYER).getSprites()[rowIndex], 0.70f);
-		else if(MapEditor.LAYER != 0)
+			this.spriteIndex = rowIndex;
+		}else if(MapEditor.LAYER != 0)
 			this.sprite = GraphicsHelp.DecreaseAlpha(MapEditor.SPRITE_LAYERS.get(MapEditor.LAYER).getSprites()[index], 0.70f);
 		else
 			this.sprite = MapEditor.SPRITE_LAYERS.get(MapEditor.LAYER).getSprites()[index];

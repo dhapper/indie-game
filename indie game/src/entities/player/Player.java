@@ -15,14 +15,14 @@ import javax.imageio.ImageIO;
 import attacks.Attack;
 import attacks.Flamethrower;
 import attacks.WaterRing;
-import entities.Enemy;
-import entities.enemy.Entity;
+import entities.Entity;
+import entities.enemy.Enemy;
 import gamestates.Overworld;
 import graphics.GraphicsHelp;
 import main.Game;
 import utilz.Constants;
 import utilz.HelpMethods;
-import utilz.ImageHelpMethods;
+import utilz.SpriteHelpMethods;
 import utilz.LoadSave;
 
 import static utilz.Constants.Attack.*;
@@ -31,14 +31,14 @@ import static utilz.Constants.Directions.*;
 public class Player extends Entity{
 	
 	// hitbox vars
-	private float xDrawOffset = 16 * Game.SCALE;
-	private float yDrawOffset = 16 * Game.SCALE;
-	private float hitboxWidth = 32 * Game.SCALE;
-	private float hitboxHeight = 32 * Game.SCALE;
-	private float xCollisionBoxOffset = 0 * Game.SCALE;
-	private float yCollisionBoxOffset = 27 * Game.SCALE;
+	private float xDrawOffset = 24 * Game.SCALE;
+	private float yDrawOffset = 18 * Game.SCALE;
+	private float hitboxWidth = 16 * Game.SCALE;
+	private float hitboxHeight = 29 * Game.SCALE;
 	private float collisionBoxWidth = hitboxWidth;
 	private float collisionBoxHeight = 5 * Game.SCALE;
+	private float xCollisionBoxOffset = 0 * Game.SCALE;
+	private float yCollisionBoxOffset = hitboxHeight - collisionBoxHeight;
 	
 	// movement/direction vars
 	private boolean left, up, right, down;
@@ -46,8 +46,6 @@ public class Player extends Entity{
 	private int movingDirection;
 	private int xLocationOffset, yLocationOffset;
 	private boolean facingForward = true;
-//	public int lookingUp = 2, lookingDown = 1, lookingForward = 0;
-//	private int lookingDir = lookingForward;
 	
 	// status
 	private boolean usingSpell = false;
@@ -59,9 +57,8 @@ public class Player extends Entity{
 	private boolean castingSpellAnimation;
 	
 	// attacks
-	private Attack updatedAttack = new Attack(this, true);
-	private Attack updatedAttack2 = new Attack(this, false);
-	private Attack[] attacks = {updatedAttack, updatedAttack2};
+	private Attack updatedAttack = new Attack(this);
+	private Attack[] attacks = {updatedAttack};
 	private int currentAttackIndex = 0;
 	private boolean inBufferFrames = false;
 	private boolean nextAttackSelected = false;
@@ -70,7 +67,7 @@ public class Player extends Entity{
 	// stats
 	private int health = 5;
 	private int maxHealth = health;
-	private int mana = 3;
+	private int mana = 7;
 	private int maxMana = mana;
 	
 	// invincibility frames
@@ -90,8 +87,18 @@ public class Player extends Entity{
 	}
 	
 	public void init() {
-		animations = ImageHelpMethods.GetSpecificSizeSprites("player/test.png", 11, 9, 64, 64);
-		mirroredAnimations = ImageHelpMethods.GetMirroredSprites(animations);
+		
+		BufferedImage layers[] = new BufferedImage[3];
+		layers[0] = LoadSave.LoadImage("player/player.png");
+		layers[1] = LoadSave.LoadImage("player/SLASH_EFFECT.png");
+		layers[2] = LoadSave.LoadImage("player/WEAPON_1.png");
+		
+		BufferedImage spriteSheet = GraphicsHelp.BuildBufferedImage(layers);
+		
+		
+		
+		animations = SpriteHelpMethods.GetSpecificSizeSprites(spriteSheet, 11, 9, 64, 64);
+		mirroredAnimations = SpriteHelpMethods.GetMirroredSprites(animations);
 		
 		initHitbox(x, y, hitboxWidth, hitboxHeight);
 		initCollisionBox(x + xCollisionBoxOffset, y + yCollisionBoxOffset, collisionBoxWidth, collisionBoxHeight);

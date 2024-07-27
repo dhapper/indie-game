@@ -8,7 +8,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import entities.Enemy;
+import entities.enemy.Enemy;
 import entities.player.Player;
 import gamestates.Overworld;
 import main.Game;
