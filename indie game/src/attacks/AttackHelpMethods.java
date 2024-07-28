@@ -4,13 +4,14 @@ import java.awt.geom.Rectangle2D;
 
 import entities.Entity;
 import entities.enemy.Enemy;
+import entities.player.Player;
 import main.Game;
 import utilz.Constants;
 import utilz.HelpMethods;
 
 public class AttackHelpMethods {
 
-	public static void KnockBack(Enemy entity, float distance, Rectangle2D.Float hitbox1, Rectangle2D.Float hitbox2) {
+	public static void KnockBack(Entity entity, float distance, Rectangle2D.Float hitbox1, Rectangle2D.Float hitbox2) {
 		float x1 = (float) hitbox1.getCenterX();
 		float y1 = (float) hitbox1.getCenterY();
 		float x2 = (float) hitbox2.getCenterX();
@@ -22,4 +23,5 @@ public class AttackHelpMethods {
 		
 		entity.moveTowardsPos(distance * Game.SCALE, adjustedVector, Constants.Directions.AWAY);
 	}
+	
 }

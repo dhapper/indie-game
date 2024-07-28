@@ -47,15 +47,11 @@ public class Overworld extends State implements Statemethods{
 	private ArrayList<Enemy> enemies;
 	private ArrayList<Entity> objects;
 	
-	
-	ArrayList<BufferedImage> deathAnimations = new ArrayList<BufferedImage>();
-	ArrayList<float[]> deathAnimationStats = new ArrayList<float[]>();
+	private DeathAnimation deathAnim = new DeathAnimation();
 	
 	public void createNewDeathAnimation(BufferedImage sprite, float x, float y, float width, float height, float xDrawOffset, float yDrawOffset) {
-		
-		deathAnimations.add(sprite);
-		deathAnimationStats.add(new float[] {x, y, width, height, xDrawOffset, yDrawOffset});
-		
+		deathAnim.getDeathAnimations().add(sprite);
+		deathAnim.getDeathAnimationStats().add(new float[] {x, y, width, height, xDrawOffset, yDrawOffset});
 	}
 	
 	public Overworld(Game game) {
@@ -86,7 +82,7 @@ public class Overworld extends State implements Statemethods{
 	public void draw(Graphics g) {
         locationManager.draw(g, xLocationOffset, yLocationOffset);;
 	
-		drawDeathAnimation(g);
+		deathAnim.draw(g, xLocationOffset, yLocationOffset);
         
 		ArrayList<Entity> orderedEntityList = sortEntitiesByY(characters);
 		for(Entity e : orderedEntityList) {
@@ -110,13 +106,6 @@ public class Overworld extends State implements Statemethods{
 		
 		player.getHud().draw(g);
 		
-	}
-	
-	public void drawDeathAnimation(Graphics g) {
-		for(int i = 0; i < deathAnimations.size(); i++) {
-			float[] stats = deathAnimationStats.get(i);
-			g.drawImage(deathAnimations.get(i), (int) (stats[0] - stats[4] - xLocationOffset), (int) (stats[1] - stats[5] - yLocationOffset), (int) stats[2], (int) stats[3], null);
-		}
 	}
 	
 	@Override
@@ -143,20 +132,10 @@ public class Overworld extends State implements Statemethods{
 		
 		player.getBook().updatePlayerPos((int) (player.getHitbox().x - xLocationOffset), (int) (player.getHitbox().y - yLocationOffset));
 		
-		updateDeathAnimation();
+		deathAnim.update();
 		
 	}
 	
-	private void updateDeathAnimation() {
-		for(BufferedImage sprite : deathAnimations) {
-			ArrayList<int[]> indices = DeathAnimation.getOpaquePixelIndices(sprite);
-			if(indices.size() > 0)
-				sprite = DeathAnimation.DeathAnim(sprite);
-			else if(indices.size() == 0) {
-				sprite = DeathAnimation.DeathAnim2(sprite);
-			}
-		}
-	}
 
 	private void updateEnemyList() {
 	    Iterator<Enemy> iterator = enemies.iterator();
@@ -183,10 +162,12 @@ public class Overworld extends State implements Statemethods{
 		}
 	}
 	
-	private void initLocationCharacters() {
+	private void initLocationVars() {
 		characters = new ArrayList<Entity>();
 		characters.add(player);
 		enemies = new ArrayList<Enemy>();
+		
+		deathAnim = new DeathAnimation();
 	}
 
 	private void loadLocation(int locationIndex) {
@@ -195,7 +176,7 @@ public class Overworld extends State implements Statemethods{
 		locationManager.setCurrentLocation(locationIndex);
 		
 		// load entities
-		initLocationCharacters();
+		initLocationVars();
 		
 		enemies = locationManager.loadEnemies(enemies);
 		objects = locationManager.loadObjects(objects);
@@ -337,6 +318,15 @@ public class Overworld extends State implements Statemethods{
 		case KeyEvent.VK_Q:
 			if(player.getMana() >= player.getWaterRing().getManaUsage())
 				player.getWaterRing().initSpellUseVars();
+			break;
+		
+		// roll
+		case KeyEvent.VK_SPACE:
+			if((player.isLeft() || player.isRight()) || (player.isUp() || player.isDown())) {
+				player.setRolling(true);
+				player.initRollVars();
+				System.out.println("roll");
+			}
 			break;
 		}
 	}

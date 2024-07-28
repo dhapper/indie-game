@@ -52,7 +52,7 @@ public class Game implements Runnable {
         TILES_IN_WIDTH = monitorWidth / TILES_SIZE;
         TILES_IN_HEIGHT = monitorHeight / TILES_SIZE;
         TILES_IN_HEIGHT--;
-        //TILES_IN_HEIGHT-=2;
+        TILES_IN_HEIGHT-=2;
 
         // Calculate game dimensions
         GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;

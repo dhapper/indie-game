@@ -65,6 +65,7 @@ public class Attack {
         switch (direction) {
         case RIGHT:
         	subtractArea(xPos + xDrawOffset, yPos + yDrawOffset, 45, 10, 45, 13, false);
+        	
         	break;
         case LEFT:
         	subtractArea(xPos + xDrawOffset + initialEllipseHitbox.getBounds().width - 45 * Game.SCALE, yPos + yDrawOffset, 45, 10, 45, 13, true);
@@ -195,8 +196,10 @@ public class Attack {
                     enemy.damageEnemy(damage);
                     enemy.setAffectedDuringAttack(true);
                     AttackHelpMethods.KnockBack(enemy, 3, player.getHitbox(), enemy.getHitbox());
+                    AttackHelpMethods.KnockBack(player, 3, enemy.getHitbox(), player.getHitbox());
                 }
                 AttackHelpMethods.KnockBack(enemy, 3, player.getHitbox(), enemy.getHitbox());
+                AttackHelpMethods.KnockBack(player, 3, enemy.getHitbox(), player.getHitbox());
             }
         }
     }

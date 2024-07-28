@@ -77,6 +77,8 @@ public class Constants {
 		public static final int ATTACKING = 6;
 		public static final int ATTACKING_DOWN = 7;
 		public static final int ATTACKING_UP = 8;
+		public static final int ROLL = 9;
+		public static final int ROLL_B = 10;
 		
 		public static int GetSpriteAmount(int player_action) {
 			switch(player_action) {
@@ -93,6 +95,9 @@ public class Constants {
 				return 11;
 			case CASTING_SPELL:
 				return 1;
+			case ROLL:
+			case ROLL_B:
+				return 9;
 			default:
 				return 0;	
 			}
@@ -100,7 +105,10 @@ public class Constants {
 		
 		public static final int ATTACK_FRAME_TIME = 7;
 		public static final int walk = 20;
-		public static final int cast = 10; 
+		public static final int cast = 10;
+		public static final int roll = 7;
+		
+		static int durations[];
 		
 		public static int[] GetSpriteDuration(int player_action) {
 			switch(player_action) {
@@ -114,12 +122,17 @@ public class Constants {
 			case ATTACKING:
 			case ATTACKING_DOWN:
 			case ATTACKING_UP:
-				int[] durations = new int[GetSpriteAmount(player_action)];
-				for(int i = 0; i < durations.length; i++)
-				    durations[i] = ATTACK_FRAME_TIME;
-				return durations;
+//				durations = new int[GetSpriteAmount(player_action)];
+//				for(int i = 0; i < durations.length; i++)
+//				    durations[i] = ATTACK_FRAME_TIME;
+//				return durations;
+				return new int[] {ATTACK_FRAME_TIME, ATTACK_FRAME_TIME, ATTACK_FRAME_TIME, ATTACK_FRAME_TIME, ATTACK_FRAME_TIME,
+						ATTACK_FRAME_TIME, ATTACK_FRAME_TIME, ATTACK_FRAME_TIME, ATTACK_FRAME_TIME, ATTACK_FRAME_TIME, ATTACK_FRAME_TIME,};
 			case CASTING_SPELL:
 				return new int[] {120};
+			case ROLL:
+			case ROLL_B:
+				return new int[] {roll, roll, roll, roll, roll, roll, roll, roll, roll};
 			default:
 				return null;	
 			}

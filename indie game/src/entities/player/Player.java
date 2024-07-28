@@ -46,6 +46,7 @@ public class Player extends Entity{
 	private int movingDirection;
 	private int xLocationOffset, yLocationOffset;
 	private boolean facingForward = true;
+	private boolean rolling = false;
 	
 	// status
 	private boolean usingSpell = false;
@@ -97,7 +98,7 @@ public class Player extends Entity{
 		
 		
 		
-		animations = SpriteHelpMethods.GetSpecificSizeSprites(spriteSheet, 11, 9, 64, 64);
+		animations = SpriteHelpMethods.GetSpecificSizeSprites(spriteSheet, 11, 11, 64, 64);
 		mirroredAnimations = SpriteHelpMethods.GetMirroredSprites(animations);
 		
 		initHitbox(x, y, hitboxWidth, hitboxHeight);
@@ -189,12 +190,16 @@ public class Player extends Entity{
 		
 		aniTick++;
 		if(aniTick >= GetSpriteDuration(action)[aniIndex]) {	// check if sprite exceeds frame duration
+			if(rolling)
+				System.out.println(GetSpriteDuration(action)[aniIndex]);
 			aniTick = 0;
 			aniIndex++;
 			if(aniIndex >= GetSpriteAmount(action)) {	// check if animation is complete
 				aniIndex = 0;
 				//attacking = false;
 				castingSpellAnimation = false;
+				rolling = false;
+				resetRollVars();
 			}
 		}
 		
@@ -240,6 +245,9 @@ public class Player extends Entity{
 		}
 		//action = facingForward ? CASTING_SPELL : CASTING_SPELL_B;
 		
+		if(rolling)
+			action = facingForward ? ROLL : ROLL_B;
+		
 		if(startAni !=  action)
 			resetAniTick();
 	}
@@ -248,9 +256,86 @@ public class Player extends Entity{
 		aniTick = 0;
 		aniIndex = 0;
 	}
+	
+	boolean rollRight = false, rollLeft = false, rollUp = false, rollDown = false;
+	int rollSpeed = 5;
+	public void initRollVars() {
+		
+		if(left)
+			rollLeft = true;
+		
+		if(right)
+			rollRight = true;
+		
+		if(up)
+			rollUp = true;
+		
+		if(down)
+			rollDown = true;
+	}
+	
+	public void resetRollVars() {
+		rollLeft = false;
+		rollRight = false;
+		rollUp = false;
+		rollDown = false;
+	}
 
-	float xSpeed = 0, ySpeed = 0;
+	public void roll() {
+		if(rollLeft)
+			xSpeed = -rollSpeed;
+		
+		if(rollRight)
+			xSpeed = rollSpeed;
+		
+		if(rollUp)
+			ySpeed = -rollSpeed;
+		
+		if(rollDown)
+			ySpeed = rollSpeed;
+		
+		// adjust speed for diagonal movement
+		if(xSpeed != 0 && ySpeed != 0) {
+	    	xSpeed *= Math.sqrt(0.5);
+	    	ySpeed *= Math.sqrt(0.5);
+	    }
+		
+		// horizontal movement
+	    if (xSpeed != 0) {
+	        if (HelpMethods.CanMoveHere(this, collisionBox.x + xSpeed, collisionBox.y, collisionBox.width, collisionBox.height, mapData)) {
+	        	if(!HelpMethods.IsEntityThere(this, xSpeed, 0, characterData)) {
+	        		hitbox.x += xSpeed;
+		            collisionBox.x += xSpeed;
+		            moving = true;
+		            updateFacingDirectionX(xSpeed, TOWARDS);
+	        	}
+	        }
+	    }
+
+	    // vertical movement
+	    if (ySpeed != 0) {
+	        if (HelpMethods.CanMoveHere(this, collisionBox.x, collisionBox.y + ySpeed, collisionBox.width, collisionBox.height, mapData)) {
+	        	if(!HelpMethods.IsEntityThere(this, 0, ySpeed, characterData)) {
+		            hitbox.y += ySpeed;
+		            moving = true;
+		            collisionBox.y += ySpeed;
+		            updateFacingDirectionY(ySpeed, TOWARDS);
+	        	}
+	        }
+	    }
+		
+	    
+	    updateMovingDirection(xSpeed, ySpeed);
+	}
+	
 	private void updatePos() {
+		
+		if(rolling) {
+			roll();
+			return;
+		}
+		
+		
 		moving = false;
 		
 		if(action == CASTING_SPELL)
@@ -509,6 +594,14 @@ public class Player extends Entity{
 
 	public HUD getHud() {
 		return hud;
+	}
+
+	public boolean isRolling() {
+		return rolling;
+	}
+
+	public void setRolling(boolean rolling) {
+		this.rolling = rolling;
 	}
 
 }

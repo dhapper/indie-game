@@ -27,7 +27,7 @@ public abstract class Enemy extends Entity{
 	protected float collisionBoxHeight;
 	
 	// stats
-	protected int maxHealth = 5;
+	protected int maxHealth = 3;
 	protected int health = maxHealth;
 	protected float speed;
 	protected int damage = 1;
@@ -36,7 +36,6 @@ public abstract class Enemy extends Entity{
 	protected boolean affectedDuringAttack = false;
 	protected boolean affectedDuringSpell = false;
 	protected boolean completedDeathAnimation = false;
-	protected float xSpeed, ySpeed;
 	
 	// player reference
 	protected Player player;
@@ -117,46 +116,44 @@ public abstract class Enemy extends Entity{
 		}
 	}
 	
-	public void moveTowardsPos(float speed, float[] vector, int mode) {
-		xSpeed = speed * vector[0]/10;
-		ySpeed = speed * vector[1]/10;
-		updatePos(xSpeed, ySpeed, mode);
-	}
+//	public void moveTowardsPos(float speed, float[] vector, int mode) {
+//		xSpeed = speed * vector[0]/10;
+//		ySpeed = speed * vector[1]/10;
+//		updatePos(xSpeed, ySpeed, mode);
+//	}
 
-	public void updatePos(float xSpeed, float ySpeed, int mode) {
-		
-		moving = false;
-		
-		// horizontal movement
-	    if (xSpeed != 0) {
-	        if (HelpMethods.CanMoveHere(this, collisionBox.x + xSpeed, collisionBox.y, collisionBox.width, collisionBox.height, mapData)) {
-	        	if(!HelpMethods.IsEntityThere(this, xSpeed, 0, characterData)) {
-		            hitbox.x += xSpeed;
-		            collisionBox.x += xSpeed;
-		            moving = true;
-		            updateFacingDirectionX(xSpeed, mode);
-	        	}
-	        }
-	    }
-
-	    // vertical movement
-	    if (ySpeed != 0) {
-	        if (HelpMethods.CanMoveHere(this, collisionBox.x, collisionBox.y + ySpeed, collisionBox.width, collisionBox.height, mapData)) {
-	        	if(!HelpMethods.IsEntityThere(this, 0, ySpeed, characterData)) {
-		            hitbox.y += ySpeed;
-		            collisionBox.y += ySpeed;
-		            moving = true;
-	        	}
-	        }
-	    }
-		
-	}
+//	public void updatePos(float xSpeed, float ySpeed, int mode) {
+//		
+//		moving = false;
+//		
+//		// horizontal movement
+//	    if (xSpeed != 0) {
+//	        if (HelpMethods.CanMoveHere(this, collisionBox.x + xSpeed, collisionBox.y, collisionBox.width, collisionBox.height, mapData)) {
+//	        	if(!HelpMethods.IsEntityThere(this, xSpeed, 0, characterData)) {
+//		            hitbox.x += xSpeed;
+//		            collisionBox.x += xSpeed;
+//		            moving = true;
+//		            updateFacingDirectionX(xSpeed, mode);
+//	        	}
+//	        }
+//	    }
+//
+//	    // vertical movement
+//	    if (ySpeed != 0) {
+//	        if (HelpMethods.CanMoveHere(this, collisionBox.x, collisionBox.y + ySpeed, collisionBox.width, collisionBox.height, mapData)) {
+//	        	if(!HelpMethods.IsEntityThere(this, 0, ySpeed, characterData)) {
+//		            hitbox.y += ySpeed;
+//		            collisionBox.y += ySpeed;
+//		            moving = true;
+//	        	}
+//	        }
+//	    }
+//		
+//	}
 	
 	public void checkIfAlive() {
-		if(health <= 0) {
-			DeathAnimation.DeathAnim(currentSprite);
+		if(health <= 0)
 			alive = false;
-		}
 	}
 	
 	protected void resetAniTick() {

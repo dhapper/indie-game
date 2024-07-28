@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import entities.enemy.Enemy;
 import graphics.GraphicsHelp;
+import utilz.HelpMethods;
 import utilz.LoadSave;
 
 import static utilz.Constants.Directions.*;
@@ -38,11 +39,48 @@ public abstract class Entity {
 	protected int action;
 	protected boolean facingRight = true;
 	
+	protected float xSpeed, ySpeed;
+	
+	public void moveTowardsPos(float speed, float[] vector, int mode) {
+		xSpeed = speed * vector[0]/10;
+		ySpeed = speed * vector[1]/10;
+		updatePos(xSpeed, ySpeed, mode);
+	}
+	
 	public Entity(float x, float y, int width, int height) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
+	}
+	
+	public void updatePos(float xSpeed, float ySpeed, int mode) {
+		
+		moving = false;
+		
+		// horizontal movement
+	    if (xSpeed != 0) {
+	        if (HelpMethods.CanMoveHere(this, collisionBox.x + xSpeed, collisionBox.y, collisionBox.width, collisionBox.height, mapData)) {
+	        	if(!HelpMethods.IsEntityThere(this, xSpeed, 0, characterData)) {
+		            hitbox.x += xSpeed;
+		            collisionBox.x += xSpeed;
+		            moving = true;
+		            updateFacingDirectionX(xSpeed, mode);
+	        	}
+	        }
+	    }
+
+	    // vertical movement
+	    if (ySpeed != 0) {
+	        if (HelpMethods.CanMoveHere(this, collisionBox.x, collisionBox.y + ySpeed, collisionBox.width, collisionBox.height, mapData)) {
+	        	if(!HelpMethods.IsEntityThere(this, 0, ySpeed, characterData)) {
+		            hitbox.y += ySpeed;
+		            collisionBox.y += ySpeed;
+		            moving = true;
+	        	}
+	        }
+	    }
+		
 	}
 	
 	protected void drawHitbox(Graphics g, int xOffset, int yOffset) {
