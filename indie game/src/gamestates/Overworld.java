@@ -4,6 +4,7 @@ import java.awt.Graphics;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,6 +12,7 @@ import java.util.Iterator;
 
 import entities.Entity;
 import entities.Tree;
+import entities.enemy.DeathAnimation;
 import entities.enemy.Enemy;
 import entities.enemy.Ghost;
 import entities.enemy.Slime;
@@ -45,6 +47,17 @@ public class Overworld extends State implements Statemethods{
 	private ArrayList<Enemy> enemies;
 	private ArrayList<Entity> objects;
 	
+	
+	ArrayList<BufferedImage> deathAnimations = new ArrayList<BufferedImage>();
+	ArrayList<float[]> deathAnimationStats = new ArrayList<float[]>();
+	
+	public void createNewDeathAnimation(BufferedImage sprite, float x, float y, float width, float height, float xDrawOffset, float yDrawOffset) {
+		
+		deathAnimations.add(sprite);
+		deathAnimationStats.add(new float[] {x, y, width, height, xDrawOffset, yDrawOffset});
+		
+	}
+	
 	public Overworld(Game game) {
 		super(game);
 		
@@ -73,7 +86,8 @@ public class Overworld extends State implements Statemethods{
 	public void draw(Graphics g) {
         locationManager.draw(g, xLocationOffset, yLocationOffset);;
 	
-		
+		drawDeathAnimation(g);
+        
 		ArrayList<Entity> orderedEntityList = sortEntitiesByY(characters);
 		for(Entity e : orderedEntityList) {
 			
@@ -90,11 +104,19 @@ public class Overworld extends State implements Statemethods{
 				((Tree) e).draw(g, xLocationOffset, yLocationOffset);
 		}
 		
+		
 		if(locationManager.getCurrentLocation().getShader() ==  1)
 			Shaders.caveShaders(g, (float) (player.getHitbox().getCenterX() - xLocationOffset), (float) (player.getHitbox().getCenterY() - yLocationOffset), 100, 100);
 		
 		player.getHud().draw(g);
 		
+	}
+	
+	public void drawDeathAnimation(Graphics g) {
+		for(int i = 0; i < deathAnimations.size(); i++) {
+			float[] stats = deathAnimationStats.get(i);
+			g.drawImage(deathAnimations.get(i), (int) (stats[0] - stats[4] - xLocationOffset), (int) (stats[1] - stats[5] - yLocationOffset), (int) stats[2], (int) stats[3], null);
+		}
 	}
 	
 	@Override
@@ -121,14 +143,31 @@ public class Overworld extends State implements Statemethods{
 		
 		player.getBook().updatePlayerPos((int) (player.getHitbox().x - xLocationOffset), (int) (player.getHitbox().y - yLocationOffset));
 		
+		updateDeathAnimation();
+		
 	}
 	
+	private void updateDeathAnimation() {
+		for(BufferedImage sprite : deathAnimations) {
+			ArrayList<int[]> indices = DeathAnimation.getOpaquePixelIndices(sprite);
+			if(indices.size() > 0)
+				sprite = DeathAnimation.DeathAnim(sprite);
+			else if(indices.size() == 0) {
+				sprite = DeathAnimation.DeathAnim2(sprite);
+			}
+		}
+	}
+
 	private void updateEnemyList() {
 	    Iterator<Enemy> iterator = enemies.iterator();
 	    while (iterator.hasNext()) {
 	        Enemy enemy = iterator.next();
 	        enemy.checkIfAlive();
 	        if (!enemy.isAlive()) {
+	        	
+	        	createNewDeathAnimation(enemy.getCurrentSprite(), enemy.getHitbox().x, enemy.getHitbox().y, Game.TILES_SIZE, Game.TILES_SIZE, enemy.getxDrawOffset(), enemy.getyDrawOffset());
+	        	
+	        	
 	            iterator.remove();
 	            System.out.println("enemy died...");
 	        }

@@ -14,16 +14,6 @@ import utilz.LoadSave;
 import static utilz.Constants.Directions.*;
 
 public class Slime extends Enemy{
-
-	// hitbox vars
-	private float xDrawOffset = 5 * Game.SCALE;
-	private float yDrawOffset = 11 * Game.SCALE;
-	private float hitboxWidth = 20 * Game.SCALE;
-	private float hitboxHeight = 15 * Game.SCALE;
-	private float xCollisionBoxOffset = 0 * Game.SCALE;
-	private float yCollisionBoxOffset = 8 * Game.SCALE;
-	private float collisionBoxWidth = 20 * Game.SCALE;
-	private float collisionBoxHeight = 7 * Game.SCALE;
 	
 	public Slime(float x, float y, int width, int height) {
 		super(x, y, width, height);
@@ -32,6 +22,16 @@ public class Slime extends Enemy{
 	}
 	
 	private void init() {
+		// hitbox vars
+		this.xDrawOffset = 5 * Game.SCALE;
+		this.yDrawOffset = 11 * Game.SCALE;
+		this.hitboxWidth = 20 * Game.SCALE;
+		this.hitboxHeight = 15 * Game.SCALE;
+		this.xCollisionBoxOffset = 0 * Game.SCALE;
+		this.yCollisionBoxOffset = 8 * Game.SCALE;
+		this.collisionBoxWidth = 20 * Game.SCALE;
+		this.collisionBoxHeight = 7 * Game.SCALE;
+		
 		animations = SpriteHelpMethods.GetDefaultSizeSprites(LoadSave.LoadImage("npc/enemy/slime.png"), 6, 3);
 		mirroredAnimations = SpriteHelpMethods.GetMirroredSprites(animations);
 		
@@ -39,6 +39,7 @@ public class Slime extends Enemy{
 		initCollisionBox(x + xCollisionBoxOffset, y + yCollisionBoxOffset, collisionBoxWidth, collisionBoxHeight);
 		
 		speed = 2;
+		
 	}
 	
 	private void setAnimation() {
@@ -53,9 +54,13 @@ public class Slime extends Enemy{
 			resetAniTick();
 	}
 	
+	
 	public void render(Graphics g, int xOffset, int yOffset) {
-		BufferedImage sprite = facingRight ? animations[aniIndex][action] : mirroredAnimations[aniIndex][action];
-		g.drawImage(sprite, (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);
+		currentSprite = facingRight ? animations[aniIndex][action] : mirroredAnimations[aniIndex][action];
+		
+		//currentSprite = DeathAnimation.DeathAnim(currentSprite);
+		
+		g.drawImage(currentSprite, (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);
 		
 		drawHealthBar(g, xOffset, yOffset);
 		

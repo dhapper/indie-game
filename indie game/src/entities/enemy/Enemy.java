@@ -3,6 +3,7 @@ package entities.enemy;
 import java.awt.Color; 
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
 import entities.Entity;
 import entities.player.Player;
@@ -13,6 +14,8 @@ import static utilz.Constants.Directions.*;
 
 public abstract class Enemy extends Entity{
 
+	BufferedImage currentSprite;
+	
 	// hitbox vars
 	protected float xDrawOffset;
 	protected float yDrawOffset;
@@ -65,13 +68,15 @@ public abstract class Enemy extends Entity{
 	}
 	
 	public void drawHealthBar(Graphics g, int xOffset, int yOffset) {
+		float xPos = hitbox.x - xOffset;//- xDrawOffset - xOffset;
+		float yPos = hitbox.y - yOffset;//yDrawOffset - yOffset;
 		
-		float xPos = hitbox.x - xDrawOffset - xOffset;
-		float yPos = hitbox.y - yDrawOffset - yOffset;
+		
+		//hhitbox.x + hitboxwidth/2 - width/2
 		
 		float width = 16 * Game.SCALE;
 		float height = 3 * Game.SCALE;
-		float heightAboveEntity = 6 * Game.SCALE;
+		float heightAboveEntity = 8 * Game.SCALE;
 		float healthBarX = xPos + hitbox.width/2 - width/2; 
 		float healthBarY = yPos - heightAboveEntity;
 		
@@ -148,8 +153,10 @@ public abstract class Enemy extends Entity{
 	}
 	
 	public void checkIfAlive() {
-		if(health <= 0)
+		if(health <= 0) {
+			DeathAnimation.DeathAnim(currentSprite);
 			alive = false;
+		}
 	}
 	
 	protected void resetAniTick() {
@@ -186,6 +193,19 @@ public abstract class Enemy extends Entity{
 	public void setAffectedDuringAttack(boolean affectedDuringAttack) {
 		this.affectedDuringAttack = affectedDuringAttack;
 	}
+	
+	public BufferedImage getCurrentSprite() {
+		return currentSprite;
+	}
+
+	public float getxDrawOffset() {
+		return xDrawOffset;
+	}
+
+	public float getyDrawOffset() {
+		return yDrawOffset;
+	}
+	
 	
 	
 

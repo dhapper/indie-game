@@ -13,16 +13,6 @@ import utilz.SpriteHelpMethods;
 import static utilz.Constants.Directions.*;
 
 public class Ghost extends Enemy{
-
-	// hitbox vars
-	private float xDrawOffset = 5 * Game.SCALE;
-	private float yDrawOffset = 0 * Game.SCALE;
-	private float hitboxWidth = 20 * Game.SCALE;
-	private float hitboxHeight = 32 * Game.SCALE;
-	private float xCollisionBoxOffset = 0 * Game.SCALE;
-	private float yCollisionBoxOffset = 20 * Game.SCALE;
-	private float collisionBoxWidth = 20 * Game.SCALE;
-	private float collisionBoxHeight = 12 * Game.SCALE;
 	
 	private int aniTick = 0;	// only resets after each attack
 	private int totalAttackTime = 500;
@@ -37,6 +27,16 @@ public class Ghost extends Enemy{
 	}
 	
 	private void init() {
+		// hitbox vars
+		this.xDrawOffset = 5 * Game.SCALE;
+		this.yDrawOffset = 0 * Game.SCALE;
+		this.hitboxWidth = 20 * Game.SCALE;
+		this.hitboxHeight = 32 * Game.SCALE;
+		this.xCollisionBoxOffset = 0 * Game.SCALE;
+		this.yCollisionBoxOffset = 20 * Game.SCALE;
+		this.collisionBoxWidth = 20 * Game.SCALE;
+		this.collisionBoxHeight = 12 * Game.SCALE;
+		
 		animations = SpriteHelpMethods.GetDefaultSizeSprites(LoadSave.LoadImage("npc/enemy/ghost.png"), 6, 1);
 		mirroredAnimations = SpriteHelpMethods.GetMirroredSprites(animations);
 		
@@ -47,8 +47,8 @@ public class Ghost extends Enemy{
 	}
 	
 	public void render(Graphics g, int xOffset, int yOffset) {
-		BufferedImage sprite = facingRight ? animations[aniIndex][0] : mirroredAnimations[aniIndex][0];
-		g.drawImage(sprite, (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);
+		currentSprite = facingRight ? animations[aniIndex][0] : mirroredAnimations[aniIndex][0];
+		g.drawImage(currentSprite, (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);
 		
 		drawHealthBar(g, xOffset, yOffset);
 		
