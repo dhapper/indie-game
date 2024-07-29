@@ -30,16 +30,6 @@ import static utilz.Constants.Directions.*;
 
 public class Player extends Entity{
 	
-	// hitbox vars
-	private float xDrawOffset = 24 * Game.SCALE;
-	private float yDrawOffset = 18 * Game.SCALE;
-	private float hitboxWidth = 16 * Game.SCALE;
-	private float hitboxHeight = 29 * Game.SCALE;
-	private float collisionBoxWidth = hitboxWidth;
-	private float collisionBoxHeight = 5 * Game.SCALE;
-	private float xCollisionBoxOffset = 0 * Game.SCALE;
-	private float yCollisionBoxOffset = hitboxHeight - collisionBoxHeight;
-	
 	// movement/direction vars
 	private boolean left, up, right, down;
 	private float playerSpeed = 0.85f * Game.SCALE;
@@ -66,9 +56,9 @@ public class Player extends Entity{
 	private int bufferFrameTickCounter = 0;
 	
 	// stats
-	private int health = 5;
+	private int health = 2;
 	private int maxHealth = health;
-	private int mana = 7;
+	private int mana = 4;
 	private int maxMana = mana;
 	
 	// invincibility frames
@@ -88,6 +78,16 @@ public class Player extends Entity{
 	}
 	
 	public void init() {
+		// hitbox vars
+		this.xDrawOffset = 24 * Game.SCALE;
+		this.yDrawOffset = 18 * Game.SCALE;
+		this.hitboxWidth = 16 * Game.SCALE;
+		this.hitboxHeight = 29 * Game.SCALE;
+		this.collisionBoxWidth = hitboxWidth;
+		this.collisionBoxHeight = 5 * Game.SCALE;
+		this.xCollisionBoxOffset = 0 * Game.SCALE;
+		this.yCollisionBoxOffset = hitboxHeight - collisionBoxHeight;
+		
 		
 		BufferedImage layers[] = new BufferedImage[3];
 		layers[0] = LoadSave.LoadImage("player/player.png");
@@ -145,11 +145,11 @@ public class Player extends Entity{
 		if(book.getBookY() <= hitbox.y - yOffset)
 			book.draw(g);
 		
-		BufferedImage sprite = facingRight ? animations[aniIndex][action] : mirroredAnimations[aniIndex][action];
+		currentSprite = facingRight ? animations[aniIndex][action] : mirroredAnimations[aniIndex][action];
 		if(invincible)
-			sprite = GraphicsHelp.DecreaseAlpha(sprite, 1.0f*invincibilityFrames/totalInvincibilityFrames);
+			currentSprite = GraphicsHelp.DecreaseAlpha(currentSprite, 1.0f*invincibilityFrames/totalInvincibilityFrames);
 
-		g.drawImage(sprite, (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);	
+		g.drawImage(currentSprite, (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);	
 		
 		if(attacking) {
 			attacks[currentAttackIndex].loadDirection(movingDirection);
@@ -455,6 +455,9 @@ public class Player extends Entity{
 		health -= damage;
 		health = Math.max(health, 0);
 		hud.updateHearts();
+		
+		if(health == 0)
+			alive = false;
 	}
 	
 	public void changeManaAmount(int manaDelta) {
@@ -579,6 +582,10 @@ public class Player extends Entity{
 	public int getHealth() {
 		return health;
 	}
+	
+	public void setHealth(int health) {
+		this.health = health;
+	}
 
 	public int getMaxHealth() {
 		return maxHealth;
@@ -586,6 +593,10 @@ public class Player extends Entity{
 	
 	public int getMana() {
 		return mana;
+	}
+	
+	public void setMana(int mana) {
+		this.mana = mana;
 	}
 
 	public int getMaxMana() {

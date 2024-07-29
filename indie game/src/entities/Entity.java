@@ -22,11 +22,22 @@ public abstract class Entity {
 	protected Rectangle2D.Float hitbox;			// for entity hitbox
 	protected Rectangle2D.Float collisionBox;	// for environment collision
 	
+	// hitbox vars
+	protected float xDrawOffset;
+	protected float yDrawOffset;
+	protected float hitboxWidth;
+	protected float hitboxHeight;
+	protected float xCollisionBoxOffset;
+	protected float yCollisionBoxOffset;
+	protected float collisionBoxWidth;
+	protected float collisionBoxHeight;
+	
 	// animation vars
 	protected BufferedImage spriteSheet;
 	protected BufferedImage[][] animations;
 	protected BufferedImage[][] mirroredAnimations;
 	protected int aniTick, aniIndex;
+	protected BufferedImage currentSprite;
 	
 	// location data
 	protected ArrayList<int[][]> mapData;
@@ -172,9 +183,24 @@ public abstract class Entity {
 		return alive;
 	}
 	
+	public void setAlive(boolean alive) {
+		this.alive = alive;
+	}
+	
 	public boolean isFacingRight() {
 		return facingRight;
 	}
 	
+	public BufferedImage getCurrentSprite() {
+		return currentSprite;
+	}
+
+	public float getxDrawOffset() {
+		return xDrawOffset;
+	}
+
+	public float getyDrawOffset() {
+		return yDrawOffset;
+	}
 	
 }

@@ -1,5 +1,6 @@
 package gamestates;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import java.awt.event.KeyEvent;
@@ -47,6 +48,15 @@ public class Overworld extends State implements Statemethods{
 	private ArrayList<Enemy> enemies;
 	private ArrayList<Entity> objects;
 	
+	// loading location vars
+	private boolean transitioning = true;
+	private boolean locationLoaded = false;
+	private boolean firstLoad = true;
+	private int loadingSpeed = 8;
+	private int nextLocationIndex;
+	private int transitionTick = 0;
+	private int spawnX, spawnY;
+	
 	private DeathAnimation deathAnim = new DeathAnimation();
 	
 	public void createNewDeathAnimation(BufferedImage sprite, float x, float y, float width, float height, float xDrawOffset, float yDrawOffset) {
@@ -62,7 +72,10 @@ public class Overworld extends State implements Statemethods{
 	
 	private void init() {
 		locationManager = new LocationManager(game);
-		player = new Player( 2 * Game.TILES_SIZE, 2 * Game.TILES_SIZE, Game.TILES_SIZE * 2, Game.TILES_SIZE * 2);
+		
+		spawnX = 2 * Game.TILES_SIZE;
+		spawnY = 2 * Game.TILES_SIZE;
+		player = new Player(spawnX, spawnY, Game.TILES_SIZE * 2, Game.TILES_SIZE * 2);
 		
 		loadLocation(0);	// first map loaded
 	}
@@ -80,6 +93,7 @@ public class Overworld extends State implements Statemethods{
 	
 	@Override
 	public void draw(Graphics g) {
+		
         locationManager.draw(g, xLocationOffset, yLocationOffset);;
 	
 		deathAnim.draw(g, xLocationOffset, yLocationOffset);
@@ -106,29 +120,61 @@ public class Overworld extends State implements Statemethods{
 		
 		player.getHud().draw(g);
 		
+		
+		if(transitioning) {
+			g.setColor(Color.BLACK);
+			g.fillRect(firstLoad ? (int) (transitionTick) : transitionTick - Game.GAME_WIDTH, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
+		}
+		
 	}
 	
 	@Override
 	public void update() {
-		// should only call when damage is dealt tbh
-		updateEnemyList();
 		
-		locationManager.update();
-		player.update();
-		checkCloseToBorder();
-		
-		checkExitZones();
-		
-		if(player.isUsingSpell()) {
-			if(player.getWaterRing().isCastingSpell()) {
-				player.getWaterRing().spellEffect();
-			}else if(player.getFlamethrower().isCastingSpell()) {
-				player.getFlamethrower().spellEffect();
+		if(transitioning) {
+			transitionTick+=loadingSpeed;
+			
+			if(transitionTick >= Game.GAME_WIDTH && !locationLoaded) {
+				loadLocation(nextLocationIndex);
+				locationLoaded = true;
+				System.out.println(nextLocationIndex);
+			}
+			
+			if(transitionTick >= Game.GAME_WIDTH * 2) {
+				transitioning = false;
+				transitionTick = 0;
+				locationLoaded = false;
+				
+				firstLoad = false;
 			}
 		}
 		
-		for(Enemy enemy : enemies)
-			enemy.update();
+		if(!transitioning) {
+		
+			// should only call when damage is dealt tbh
+			updateEnemyList();
+			
+			locationManager.update();
+			player.update();
+			checkCloseToBorder();
+			
+			checkExitZones();
+			
+			if(player.isUsingSpell()) {
+				if(player.getWaterRing().isCastingSpell()) {
+					player.getWaterRing().spellEffect();
+				}else if(player.getFlamethrower().isCastingSpell()) {
+					player.getFlamethrower().spellEffect();
+				}
+			}
+			
+			for(Enemy enemy : enemies)
+				enemy.update();
+			
+			
+			checkPlayerState();
+			
+		}
 		
 		player.getBook().updatePlayerPos((int) (player.getHitbox().x - xLocationOffset), (int) (player.getHitbox().y - yLocationOffset));
 		
@@ -136,6 +182,17 @@ public class Overworld extends State implements Statemethods{
 		
 	}
 	
+	private void checkPlayerState() {
+		if(!player.isAlive()) {
+			createNewDeathAnimation(player.getCurrentSprite(), player.getHitbox().x, player.getHitbox().y, Game.TILES_SIZE * 2, Game.TILES_SIZE * 2, player.getxDrawOffset(), player.getyDrawOffset());
+			player.setHealth(player.getMaxHealth());
+			player.setMana(player.getMaxMana());
+			player.updatePlayerPos(spawnX, spawnY);
+			player.setAlive(true);
+			player.setInvincible(true);
+			player.getHud().updateHearts();
+		}
+	}
 
 	private void updateEnemyList() {
 	    Iterator<Enemy> iterator = enemies.iterator();
@@ -156,8 +213,10 @@ public class Overworld extends State implements Statemethods{
 	private void checkExitZones() {
 		for(ExitZone ez : locationManager.getCurrentLocation().getExitZones()) {
 			if(ez.getBoundary().intersects(player.getCollisionBox())) {
-				player.updatePlayerPos(ez.getX(), ez.getY());
-				loadLocation(ez.getLocationIndex());
+				spawnX = ez.getX();
+				spawnY = ez.getY();
+				initLoadingLocation(ez.getLocationIndex());
+				//loadLocation(ez.getLocationIndex());
 			}
 		}
 	}
@@ -169,8 +228,16 @@ public class Overworld extends State implements Statemethods{
 		
 		deathAnim = new DeathAnimation();
 	}
-
+	
+	private void initLoadingLocation(int locationIndex) {
+		transitioning = true;
+		nextLocationIndex = locationIndex;
+	}
+	
 	private void loadLocation(int locationIndex) {
+		
+		// update player location
+		player.updatePlayerPos(spawnX, spawnY);
 		
 		// set location in manager
 		locationManager.setCurrentLocation(locationIndex);

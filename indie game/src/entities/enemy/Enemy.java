@@ -13,8 +13,6 @@ import utilz.HelpMethods;
 import static utilz.Constants.Directions.*;
 
 public abstract class Enemy extends Entity{
-
-	BufferedImage currentSprite;
 	
 	// hitbox vars
 	protected float xDrawOffset;
@@ -189,18 +187,6 @@ public abstract class Enemy extends Entity{
 
 	public void setAffectedDuringAttack(boolean affectedDuringAttack) {
 		this.affectedDuringAttack = affectedDuringAttack;
-	}
-	
-	public BufferedImage getCurrentSprite() {
-		return currentSprite;
-	}
-
-	public float getxDrawOffset() {
-		return xDrawOffset;
-	}
-
-	public float getyDrawOffset() {
-		return yDrawOffset;
 	}
 	
 	

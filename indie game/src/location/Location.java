@@ -114,6 +114,7 @@ public class Location {
         Rectangle exitZoneRect;
         switch (index) {
             case 0:
+            	//exitZoneRect = new Rectangle(5 * Game.TILES_SIZE, 5 * Game.TILES_SIZE, Game.TILES_SIZE, Game.TILES_SIZE);
             	exitZoneRect = new Rectangle(40 * Game.TILES_SIZE, 38 * Game.TILES_SIZE, Game.TILES_SIZE, Game.TILES_SIZE);
                 exitZones.add(new ExitZone(exitZoneRect, 1, 2 * Game.TILES_SIZE, 4 * Game.TILES_SIZE));
                 break;

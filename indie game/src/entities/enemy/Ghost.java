@@ -47,8 +47,8 @@ public class Ghost extends Enemy{
 	}
 	
 	public void render(Graphics g, int xOffset, int yOffset) {
-		currentSprite = facingRight ? animations[aniIndex][0] : mirroredAnimations[aniIndex][0];
-		g.drawImage(currentSprite, (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);
+		BufferedImage sprite = facingRight ? animations[aniIndex][0] : mirroredAnimations[aniIndex][0];
+		g.drawImage(sprite, (int) (hitbox.x - xDrawOffset) - xOffset, (int) (hitbox.y - yDrawOffset) - yOffset, width, height, null);
 		
 		drawHealthBar(g, xOffset, yOffset);
 		
