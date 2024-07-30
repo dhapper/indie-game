@@ -123,7 +123,7 @@ public class Overworld extends State implements Statemethods{
 		
 		if(transitioning) {
 			g.setColor(Color.BLACK);
-			g.fillRect(firstLoad ? (int) (transitionTick) : transitionTick - Game.GAME_WIDTH, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
+			g.fillRect(firstLoad ? transitionTick/2 : transitionTick - Game.GAME_WIDTH, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
 		}
 		
 	}
@@ -132,7 +132,7 @@ public class Overworld extends State implements Statemethods{
 	public void update() {
 		
 		if(transitioning) {
-			transitionTick+=loadingSpeed;
+			transitionTick += firstLoad ? loadingSpeed * 2 : loadingSpeed;
 			
 			if(transitionTick >= Game.GAME_WIDTH && !locationLoaded) {
 				loadLocation(nextLocationIndex);
@@ -172,7 +172,7 @@ public class Overworld extends State implements Statemethods{
 				enemy.update();
 			
 			
-			checkPlayerState();
+			checkPlayerDead();
 			
 		}
 		
@@ -182,12 +182,12 @@ public class Overworld extends State implements Statemethods{
 		
 	}
 	
-	private void checkPlayerState() {
+	private void checkPlayerDead() {
 		if(!player.isAlive()) {
 			createNewDeathAnimation(player.getCurrentSprite(), player.getHitbox().x, player.getHitbox().y, Game.TILES_SIZE * 2, Game.TILES_SIZE * 2, player.getxDrawOffset(), player.getyDrawOffset());
 			player.setHealth(player.getMaxHealth());
 			player.setMana(player.getMaxMana());
-			player.updatePlayerPos(spawnX, spawnY);
+			changePlayerPos();
 			player.setAlive(true);
 			player.setInvincible(true);
 			player.getHud().updateHearts();
@@ -236,9 +236,6 @@ public class Overworld extends State implements Statemethods{
 	
 	private void loadLocation(int locationIndex) {
 		
-		// update player location
-		player.updatePlayerPos(spawnX, spawnY);
-		
 		// set location in manager
 		locationManager.setCurrentLocation(locationIndex);
 		
@@ -272,6 +269,13 @@ public class Overworld extends State implements Statemethods{
 		maxTilesOffsetY = locationTilesHigh - Game.TILES_IN_HEIGHT;
 		maxLocationOffsetX = maxTilesOffsetX * Game.TILES_SIZE;
 		maxLocationOffsetY = maxTilesOffsetY * Game.TILES_SIZE;
+		
+		changePlayerPos();
+	}
+	
+	private void changePlayerPos() {
+		// update player location
+		player.updatePlayerPos(spawnX, spawnY);
 		
 		// update book pos
 		checkCloseToBorder();
